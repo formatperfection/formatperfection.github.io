@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A PDF editor with all of these features:
+     A signature stored until another signature is set,
+     Editing with so many font families and sizes,
+     Highlighting text in the PDF file,
+     using a pen inside a PDF file
+    "
+    />
+    <title>PDF Editor</title>
+    <link rel="stylesheet" href="pdfeditor.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Free PDF Editor</h1>
+      <input id="fileInput" type="file" style="display: none" />
+      <label for="fileInput" id="fileInputLabel"> Choose Your PDF File </label>
+      <button id="openBtn" style="display: none">Open PDF File</button>
+    </div>
+    <script src="pdfeditor.js"></script>
+    <script src="assets/jspdf.umd.min.js"></script>
+    <script src="assets/pdf-lib.min.js"></script>
+  </body>
+</html>

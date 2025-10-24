@@ -1,0 +1,11 @@
+workers — number of Web Workers.
+
+quality — 1 (high) to 30 (low).
+
+width & height — output GIF size.
+
+transparent — color to make transparent. true | false
+
+repeat — 0 = loop infinitely, -1 = no loop.
+
+background — background color.

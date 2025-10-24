@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Resize Image</title>
+</head>
+<body>
+  <h2>Resize an Image (Make It Bigger)</h2>
+  <input type="file" id="upload" accept="image/png, image/jpeg"><br><br>
+  <canvas id="canvas" style="display:none;"></canvas>
+  <br>
+  <a id="download" style="display:none;">Download Resized Image</a>
+
+  <script>
+    document.getElementById('upload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const scaleFactor = 2; // Change this to make image 2x, 3x, etc.
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.getElementById('canvas');
+          const ctx = canvas.getContext('2d');
+
+          // Set canvas size to scaled image size
+          canvas.width = img.width * scaleFactor;
+          canvas.height = img.height * scaleFactor;
+
+          // Draw the scaled image
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // Show canvas
+          canvas.style.display = 'block';
+
+          // Generate data URL for download
+          const dataURL = canvas.toDataURL('image/jpeg'); // or 'image/png'
+          const downloadLink = document.getElementById('download');
+          downloadLink.href = dataURL;
+          downloadLink.download = 'resized-image.jpg';
+          downloadLink.textContent = 'Download Resized Image';
+          downloadLink.style.display = 'inline';
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
+
