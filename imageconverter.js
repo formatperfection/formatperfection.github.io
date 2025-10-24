@@ -101,7 +101,8 @@ function getMime(type) {
       return "image/heif";
     case "output-ico":
       return "image/x-icon";
-
+    case "output-svg2":
+      return "image/svg+xml";
     default:
       return "Unknown";
   }
@@ -148,6 +149,8 @@ function getExt(type) {
       return "pgm";
     case "output-ico":
       return "ico";
+    case "output-svg2":
+      return "svg2";
   }
 }
 // Convert Image Function
@@ -358,7 +361,7 @@ async function convertImage(file, mimeType, ext) {
   reader.onload = async () => {
     progressBar.value = 100;
     // === SVG Vectorization ===
-    if (mimeType === "image/svg+xml") {
+    if (ext === "svg") {
       try {
         const { svgString, url } = await convertToVectorSVG(file, {
           ltres: 1,
@@ -378,6 +381,35 @@ async function convertImage(file, mimeType, ext) {
         console.error(err);
       }
       progressBar.style.display = "none";
+      return;
+    }
+    if (ext === "svg2") {
+      const img = new Image();
+      img.onload = () => {
+        sharedCanvas.width = img.width;
+        sharedCanvas.height = img.height;
+        const useTransparent = transparentBgCheckbox.checked;
+
+        if (!useTransparent) {
+          sharedCtx.fillStyle = "#ffffff"; // white background
+          sharedCtx.fillRect(0, 0, img.width, img.height);
+        } else {
+          sharedCtx.clearRect(0, 0, img.width, img.height); // keep alpha
+        }
+        sharedCtx.drawImage(img, 0, 0);
+        const imageData = sharedCtx.getImageData(0, 0, img.width, img.height);
+        const blob = encodeBMP(imageData);
+        const url = URL.createObjectURL(blob);
+        const originalName = file.name.replace(/\.[^/.]+$/, "");
+        const dataURL = sharedCanvas.toDataURL("image/svg+xml");
+        resultDiv.innerHTML = `
+        <img src="${dataURL}"/> <br>
+          <a href="${dataURL}" download="${originalName}.bmp">Download BMP</a>
+        `;
+        progressBar.style.display = "none";
+      };
+
+      img.src = reader.result;
       return;
     }
     if (ext === "bmp") {
