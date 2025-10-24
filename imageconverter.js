@@ -404,7 +404,7 @@ async function convertImage(file, mimeType, ext) {
         const dataURL = sharedCanvas.toDataURL("image/svg+xml");
         resultDiv.innerHTML = `
         <img src="${dataURL}"/> <br>
-          <a href="${dataURL}" download="${originalName}.bmp">Download BMP</a>
+          <a href="${dataURL}" download="${originalName}.svg">Download SVG</a>
         `;
         progressBar.style.display = "none";
       };
