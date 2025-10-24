@@ -99,6 +99,8 @@ function getMime(type) {
       return "application/octet-stream";
     case "output-heic":
       return "image/heif";
+    case "output-ico":
+      return "image/x-icon";
 
     default:
       return "Unknown";
@@ -144,6 +146,8 @@ function getExt(type) {
       return "pbm";
     case "output-pgm":
       return "pgm";
+    case "output-ico":
+      return "ico";
   }
 }
 // Convert Image Function
@@ -405,6 +409,43 @@ async function convertImage(file, mimeType, ext) {
       img.src = reader.result;
       return;
     }
+    if (ext === "ico") {
+      const img = new Image();
+      img.onload = async () => {
+        // make this async
+        sharedCanvas.width = img.width;
+        sharedCanvas.height = img.height;
+        const useTransparent = transparentBgCheckbox.checked;
+
+        if (!useTransparent) {
+          sharedCtx.fillStyle = "#ffffff"; // white background
+          sharedCtx.fillRect(0, 0, img.width, img.height);
+        } else {
+          sharedCtx.clearRect(0, 0, img.width, img.height); // keep alpha
+        }
+
+        sharedCtx.drawImage(img, 0, 0);
+        const imageData = sharedCtx.getImageData(0, 0, img.width, img.height);
+
+        // await the async ICO encoder
+        const blob = await encodeICO(imageData);
+        const url = URL.createObjectURL(blob);
+
+        const originalName = file.name.replace(/\.[^/.]+$/, "");
+        const dataURL = sharedCanvas.toDataURL("image/png");
+
+        resultDiv.innerHTML = `
+          <img src="${dataURL}"/> <br>
+          <a href="${url}" download="${originalName}.ico">Download ICO</a>
+        `;
+
+        progressBar.style.display = "none";
+      };
+
+      img.src = reader.result;
+      return;
+    }
+
     if (ext === "avif") {
       const img = new Image();
       img.onload = () => {
@@ -1147,6 +1188,52 @@ function encodeBMP(imageData) {
   );
 
   return new Blob([bmpBuffer], { type: "image/bmp" });
+}
+
+// Fixed ICO encoder — returns a Promise
+async function encodeICO(imageData) {
+  // Create a temporary canvas if input is ImageData
+  let canvas;
+  if (imageData instanceof ImageData) {
+    canvas = document.createElement("canvas");
+    canvas.width = imageData.width;
+    canvas.height = imageData.height;
+    const ctx = canvas.getContext("2d");
+    ctx.putImageData(imageData, 0, 0);
+  } else {
+    // Assume it's a canvas
+    canvas = imageData;
+  }
+
+  return new Promise((resolve) => {
+    canvas.toBlob(async (pngBlob) => {
+      const arrayBuffer = await pngBlob.arrayBuffer();
+      const icoBuffer = new Uint8Array(6 + 16 + arrayBuffer.byteLength); // ICONDIR + ICONDIRENTRY + PNG data
+      const dv = new DataView(icoBuffer.buffer);
+
+      // ICONDIR
+      dv.setUint16(0, 0, true); // reserved
+      dv.setUint16(2, 1, true); // type = icon
+      dv.setUint16(4, 1, true); // 1 image
+
+      // ICONDIRENTRY
+      const width = canvas.width > 255 ? 0 : canvas.width; // 0 = 256
+      const height = canvas.height > 255 ? 0 : canvas.height;
+      icoBuffer[6] = width;
+      icoBuffer[7] = height;
+      icoBuffer[8] = 0; // color palette
+      icoBuffer[9] = 0; // reserved
+      dv.setUint16(10, 1, true); // planes
+      dv.setUint16(12, 32, true); // bit count
+      dv.setUint32(14, arrayBuffer.byteLength, true); // size
+      dv.setUint32(18, 6 + 16, true); // offset to image data
+
+      // copy PNG data
+      icoBuffer.set(new Uint8Array(arrayBuffer), 22);
+
+      resolve(new Blob([icoBuffer], { type: "image/x-icon" }));
+    }, "image/png");
+  });
 }
 
 // === Vectorization helper for SVG ===
