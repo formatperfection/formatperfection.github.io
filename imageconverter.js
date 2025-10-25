@@ -459,6 +459,7 @@ async function convertImage(file, mimeType, ext) {
       img.onload = () => {
         sharedCanvas.width = img.width;
         sharedCanvas.height = img.height;
+        const originalName = file.name.replace(/\.[^/.]+$/, "");
         sharedCtx.drawImage(img, 0, 0);
 
         const imageData = sharedCtx.getImageData(0, 0, img.width, img.height);
