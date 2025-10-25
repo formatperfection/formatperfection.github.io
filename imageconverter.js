@@ -398,48 +398,58 @@ async function convertImage(file, mimeType, ext) {
     // VML Encoding
     
 if (ext === "vml") {
-     const canvas = sharedCanvas;
-  const ctx = canvas.getContext("2d");
-  const width = canvas.width;
-  const height = canvas.height;
-  const originalName = file.name.replace(/\.[^/.]+$/, "");
+    const canvas = sharedCanvas; // You can still use sharedCanvas
+    const ctx = canvas.getContext("2d");
+    const width = canvas.width;
+    const height = canvas.height;
+    const originalName = file.name.replace(/\.[^/.]+$/, "");
 
-  const imageData = ctx.getImageData(0, 0, width, height).data;
+    const imageData = ctx.getImageData(0, 0, width, height).data;
 
-  // Start VML content
-  let vmlContent = `<xml xmlns:v="urn:schemas-microsoft-com:vml">\n`;
-  vmlContent += `<v:group style="width:${width}px;height:${height}px;" coordsize="${width},${height}">\n`;
+    // Start VML content
+    let vmlContent = `<xml xmlns:v="urn:schemas-microsoft-com:vml">\n`;
+    vmlContent += `<v:group style="width:${width}px;height:${height}px;" coordsize="${width},${height}">\n`;
 
-  // Very simple vectorization: one rectangle per pixel
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const i = (y * width + x) * 4;
-      const r = imageData[i];
-      const g = imageData[i + 1];
-      const b = imageData[i + 2];
-      const a = imageData[i + 3] / 255;
+    // Simple vectorization: one rectangle per pixel
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const i = (y * width + x) * 4;
+            const r = imageData[i];
+            const g = imageData[i + 1];
+            const b = imageData[i + 2];
+            const a = imageData[i + 3] / 255;
 
-      if (a === 0) continue; // skip fully transparent
+            if (a === 0) continue; // skip fully transparent
 
-      const fillColor = `rgb(${r},${g},${b})`;
+            const fillColor = `rgb(${r},${g},${b})`;
 
-      vmlContent += `<v:rect style="position:absolute; left:${x}px; top:${y}px; width:1px; height:1px;" fillcolor="${fillColor}" stroked="false" />\n`;
+            vmlContent += `<v:rect style="position:absolute; left:${x}px; top:${y}px; width:1px; height:1px;" fillcolor="${fillColor}" stroked="false" />\n`;
+        }
     }
-  }
 
-  vmlContent += `</v:group>\n</xml>`;
+    vmlContent += `</v:group>\n</xml>`;
 
-  const blob = new Blob([vmlContent], { type: "application/vnd.ms-vml" });
-  const url = URL.createObjectURL(blob);
+    // Create a Blob with text/xml type
+    const blob = new Blob([vmlContent], { type: "text/xml" });
+    const url = URL.createObjectURL(blob);
 
-  resultDiv.innerHTML = `
-  <textarea readonly style="width:100%; height:200px; background:#000; color:#0ff; border:2px solid #0ff; border-radius:10px; resize: none;">${vmlContent}</textarea>
-  <br/>
-  <a href="${url}" download="${originalName}.vml">Download VML</a>
-`;
+    // Create a forced download link
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = originalName + ".vml";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 
-  progressBar.style.display = "none";
+    // Optional: show VML in textarea
+    resultDiv.innerHTML = `
+        <textarea readonly style="width:100%; height:200px; background:#000; color:#0ff; border:2px solid #0ff; border-radius:10px; resize:none;">${vmlContent}</textarea>
+    `;
+
+    progressBar.style.display = "none";
 }
+
     // XML creation
     if (ext === "dds") {
       const img = new Image();
