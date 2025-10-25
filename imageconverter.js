@@ -462,7 +462,7 @@ if (ext === "vml") {
   const url = URL.createObjectURL(blob);
 
   resultDiv.innerHTML = `
-    <textarea readonly style="width:100%; height:200px;">${vmlContent}</textarea>
+    <textarea readonly style="width:100%; height:200px; background:#000; color:#0ff; border:2px solid #0ff; border-radius:10px; resize: none;">
     <br/>
     <a href="${url}" download="${originalName}.vml">Download VML</a>
   `;
@@ -497,7 +497,7 @@ if (ext === "vml") {
         const url = URL.createObjectURL(blob);
 
         resultDiv.innerHTML = `
-          <textarea readonly style="width:100%; height:200px;">${tsv}</textarea>
+          <textarea readonly style="width:100%; height:200px; background:#000; color:#0ff; border:2px solid #0ff; border-radius:10px; resize: none;"></textarea>
           <br/>
           <a href="${url}" download="${originalName}.tsv">Download TSV</a>
         `;
