@@ -182,7 +182,7 @@ function getExt(type) {
       return "tga";
     case "output-qoi":
       return "qoi";
-          case "output-vml":
+    case "output-vml":
       return "vml";
     default:
       "unknown";
