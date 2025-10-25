@@ -116,7 +116,7 @@ function getMime(type) {
     case "output-qoi":
       return "image/qoi";
     case "output-vml":
-      return "application/vnd.ms-vm";
+      return "application/vnd.ms-vml";
     case "output-tsv":
       return "text/tab-separated-values";
 
@@ -397,7 +397,7 @@ async function convertImage(file, mimeType, ext) {
     progressBar.value = 100;
     // VML Encoding
     
-if (mimeType === "application/vnd.ms-vm") {
+if (mimeType === "application/vnd.ms-vml") {
     const canvas = sharedCanvas; // You can still use sharedCanvas
     const ctx = canvas.getContext("2d");
     const width = canvas.width;
