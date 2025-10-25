@@ -446,8 +446,8 @@ function connectToServer() {
       }
     } else {
       // 1p mode: Arrow keys for player
-      if (keysPressed["arrowup"]) playerY -= 12;
-      if (keysPressed["arrowdown"]) playerY += 12;
+      if (keysPressed["arrowup"]) playerY -= 13;
+      if (keysPressed["arrowdown"]) playerY += 13;
       playerY = Math.max(0, Math.min(canvas.height - paddleHeight, playerY));
     }
   }
