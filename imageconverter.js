@@ -430,22 +430,15 @@ if (mimeType === "application/vnd.ms-vml") {
     vmlContent += `</v:group>\n</xml>`;
 
     // Create a Blob with text/xml type
-    const blob = new Blob([vmlContent], { type: "text/xml" });
+    const blob = new Blob([vmlContent], { type: "plain/text" });
     const url = URL.createObjectURL(blob);
 
-    // Create a forced download link
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = originalName + ".vml";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
 
     // Optional: show VML in textarea
     resultDiv.innerHTML = `
         <textarea readonly style="width:100%; height:200px; background:#000; color:#0ff; border:2px solid #0ff; border-radius:10px; resize:none;">${vmlContent}</textarea>
-    `;
+        <a href="${url}" download="${orginalName}.vml">Download VML</a>
+        `;
 
     progressBar.style.display = "none";
 }
