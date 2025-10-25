@@ -386,7 +386,7 @@ async function convertImage(file, mimeType, ext) {
       .replace(/>/g, "&gt;");
 
     resultDiv.innerHTML = `
-      <textarea readonly rows="20" cols="80" style="width:100%; font-family:monospace;">
+      <textarea readonly style="width:100%; height:200px; background:#000; color:#0ff; border:2px solid #0ff; border-radius:10px;">
 ${svgString}
       </textarea>
       <br/>
@@ -599,7 +599,7 @@ ${svgString}
     const jsonString = JSON.stringify(jsonObj, null, 2); // pretty print JSON
 
     resultDiv.innerHTML = `
-      <textarea readonly rows="20" style="width:100%; font-family:monospace;">
+      <textarea readonly style="width:100%; height:200px; background:#000; color:#0ff; border:2px solid #0ff; border-radius:10px;">
 ${jsonString}
       </textarea>
       <br/>
