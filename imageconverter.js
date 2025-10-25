@@ -115,6 +115,14 @@ function getMime(type) {
       return "image/x-tga";
     case "output-qoi":
       return "image/qoi";
+    case "output-vml":
+      return "application/vnd.ms-vml";
+    case "output-tsv":
+      return "text/tab-separated-values";
+    case "output-vml":
+      return "vml";
+    case "output-tsv":
+      return "tsv";
 
     default:
       return "unknown";
@@ -411,6 +419,68 @@ async function convertImage(file, mimeType, ext) {
         resultDiv.innerHTML = `
           <img src="${preview}" /><br>
           <a href="${url}" download="${originalName}.dds">Download DDS</a>
+        `;
+        progressBar.style.display = "none";
+      };
+      img.src = reader.result;
+      return;
+    }
+    // === VML Output ===
+    if (ext === "vml") {
+      const img = new Image();
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+
+        const dataUrl = sharedCanvas.toDataURL("image/png");
+        const vmlContent = `
+  <v:shape style="width:${width}px;height:${height}px;" coordsize="${width},${height}">
+    <v:imagedata src="${dataUrl}" />
+  </v:shape>`;
+
+        const blob = new Blob([vmlContent], { type: "application/vnd.ms-vml" });
+        const url = URL.createObjectURL(blob);
+
+        resultDiv.innerHTML = `
+          <textarea readonly style="width:100%; height:200px;">${vmlContent}</textarea>
+          <br/>
+          <a href="${url}" download="${originalName}.vml">Download VML</a>
+        `;
+        progressBar.style.display = "none";
+      };
+      img.src = reader.result;
+      return;
+    }
+
+    // === TSV Output ===
+    if (ext === "tsv") {
+      const img = new Image();
+      img.onload = () => {
+        sharedCanvas.width = img.width;
+        sharedCanvas.height = img.height;
+        sharedCtx.drawImage(img, 0, 0);
+
+        const imageData = sharedCtx.getImageData(0, 0, img.width, img.height);
+        const { data, width, height } = imageData;
+
+        // Convert pixel data to TSV (R G B per cell)
+        let tsv = "";
+        for (let y = 0; y < height; y++) {
+          let row = [];
+          for (let x = 0; x < width; x++) {
+            const i = (y * width + x) * 4;
+            row.push(`${data[i]}\t${data[i + 1]}\t${data[i + 2]}`); // R G B
+          }
+          tsv += row.join("\t") + "\n";
+        }
+
+        const blob = new Blob([tsv], { type: "text/tab-separated-values" });
+        const url = URL.createObjectURL(blob);
+
+        resultDiv.innerHTML = `
+          <textarea readonly style="width:100%; height:200px;">${tsv}</textarea>
+          <br/>
+          <a href="${url}" download="${originalName}.tsv">Download TSV</a>
         `;
         progressBar.style.display = "none";
       };
