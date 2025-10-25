@@ -395,6 +395,50 @@ async function convertImage(file, mimeType, ext) {
 
   reader.onload = async () => {
     progressBar.value = 100;
+    // VML Encoding
+    
+if (ext === "vml") {
+     const canvas = sharedCanvas;
+  const ctx = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+  const originalName = file.name.replace(/\.[^/.]+$/, "");
+
+  const imageData = ctx.getImageData(0, 0, width, height).data;
+
+  // Start VML content
+  let vmlContent = `<xml xmlns:v="urn:schemas-microsoft-com:vml">\n`;
+  vmlContent += `<v:group style="width:${width}px;height:${height}px;" coordsize="${width},${height}">\n`;
+
+  // Very simple vectorization: one rectangle per pixel
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      const r = imageData[i];
+      const g = imageData[i + 1];
+      const b = imageData[i + 2];
+      const a = imageData[i + 3] / 255;
+
+      if (a === 0) continue; // skip fully transparent
+
+      const fillColor = `rgb(${r},${g},${b})`;
+
+      vmlContent += `<v:rect style="position:absolute; left:${x}px; top:${y}px; width:1px; height:1px;" fillcolor="${fillColor}" stroked="false" />\n`;
+    }
+  }
+
+  vmlContent += `</v:group>\n</xml>`;
+
+  const blob = new Blob([vmlContent], { type: "application/vnd.ms-vml" });
+  const url = URL.createObjectURL(blob);
+
+  resultDiv.innerHTML = `
+    <textarea readonly style="width:100%; height:200px; background:#000; color:#0ff; border:2px solid #0ff; border-radius:10px; resize: none;">
+    <br/>
+    <a href="${url}" download="${originalName}.vml">Download VML</a>
+  `;
+  progressBar.style.display = "none";
+}
     // XML creation
     if (ext === "dds") {
       const img = new Image();
@@ -425,10 +469,6 @@ async function convertImage(file, mimeType, ext) {
       img.src = reader.result;
       return;
     }
-    // === VML Output ===
-if (mimeType === "application/vnd.ms-vml") {
-    encodeVML();
-}
 
 
     // === TSV Output ===
@@ -1682,48 +1722,7 @@ function encodeQOI(imageData) {
 
   return new Blob([header, pixelData], { type: "image/qoi" });
 }
-function encodeVML() {
-    const canvas = sharedCanvas;
-  const ctx = canvas.getContext("2d");
-  const width = canvas.width;
-  const height = canvas.height;
-  const originalName = file.name.replace(/\.[^/.]+$/, "");
 
-  const imageData = ctx.getImageData(0, 0, width, height).data;
-
-  // Start VML content
-  let vmlContent = `<xml xmlns:v="urn:schemas-microsoft-com:vml">\n`;
-  vmlContent += `<v:group style="width:${width}px;height:${height}px;" coordsize="${width},${height}">\n`;
-
-  // Very simple vectorization: one rectangle per pixel
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const i = (y * width + x) * 4;
-      const r = imageData[i];
-      const g = imageData[i + 1];
-      const b = imageData[i + 2];
-      const a = imageData[i + 3] / 255;
-
-      if (a === 0) continue; // skip fully transparent
-
-      const fillColor = `rgb(${r},${g},${b})`;
-
-      vmlContent += `<v:rect style="position:absolute; left:${x}px; top:${y}px; width:1px; height:1px;" fillcolor="${fillColor}" stroked="false" />\n`;
-    }
-  }
-
-  vmlContent += `</v:group>\n</xml>`;
-
-  const blob = new Blob([vmlContent], { type: "application/vnd.ms-vml" });
-  const url = URL.createObjectURL(blob);
-
-  resultDiv.innerHTML = `
-    <textarea readonly style="width:100%; height:200px; background:#000; color:#0ff; border:2px solid #0ff; border-radius:10px; resize: none;">
-    <br/>
-    <a href="${url}" download="${originalName}.vml">Download VML</a>
-  `;
-  progressBar.style.display = "none";
-}
 
 // === Vectorization helper for SVG ===
 async function convertToVectorSVG(file, options = {}) {
