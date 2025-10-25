@@ -426,7 +426,7 @@ async function convertImage(file, mimeType, ext) {
       return;
     }
     // === VML Output ===
-if (ext === "vml") {
+if (mimeType === "application/vnd.ms-vml") {
     encodeVML();
 }
 
