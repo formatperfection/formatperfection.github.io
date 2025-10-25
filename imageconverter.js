@@ -498,7 +498,7 @@ if (ext === "vml") {
         const url = URL.createObjectURL(blob);
 
         resultDiv.innerHTML = `
-          <textarea readonly style="width:100%; height:200px; background:#000; color:#0ff; border:2px solid #0ff; border-radius:10px; resize: none;"></textarea>
+          <textarea readonly style="width:100%; height:200px; background:#000; color:#0ff; border:2px solid #0ff; border-radius:10px; resize: none;">${tsv}</textarea>
           <br/>
           <a href="${url}" download="${originalName}.tsv">Download TSV</a>
         `;
