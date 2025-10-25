@@ -185,7 +185,7 @@ function getExt(type) {
     case "output-tsv":
       return "tsv";
     default:
-      "unknown";
+      return "unknown";
   }
 }
 // Convert Image Function
@@ -396,23 +396,28 @@ async function convertImage(file, mimeType, ext) {
   reader.onload = async () => {
     progressBar.value = 100;
     // VML Encoding
-    
-if (mimeType === "application/vnd.ms-vml") {
-    const canvas = sharedCanvas; // You can still use sharedCanvas
-    const ctx = canvas.getContext("2d");
-    const width = canvas.width;
-    const height = canvas.height;
-    const originalName = file.name.replace(/\.[^/.]+$/, "");
 
-    const imageData = ctx.getImageData(0, 0, width, height).data;
+    if (mimeType === "application/vnd.ms-vml") {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = sharedCanvas;
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const width = canvas.width;
+        const height = canvas.height;
+        const originalName = file.name.replace(/\.[^/.]+$/, "");
 
-    // Start VML content
-    let vmlContent = `<xml xmlns:v="urn:schemas-microsoft-com:vml">\n`;
-    vmlContent += `<v:group style="width:${width}px;height:${height}px;" coordsize="${width},${height}">\n`;
+        const imageData = ctx.getImageData(0, 0, width, height).data;
 
-    // Simple vectorization: one rectangle per pixel
-    for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
+        // Start VML content
+        let vmlContent = `<xml xmlns:v="urn:schemas-microsoft-com:vml">\n`;
+        vmlContent += `<v:group style="width:${width}px;height:${height}px;" coordsize="${width},${height}">\n`;
+
+        // Vectorize: one rectangle per non-transparent pixel
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
             const i = (y * width + x) * 4;
             const r = imageData[i];
             const g = imageData[i + 1];
@@ -422,26 +427,28 @@ if (mimeType === "application/vnd.ms-vml") {
             if (a === 0) continue; // skip fully transparent
 
             const fillColor = `rgb(${r},${g},${b})`;
-
             vmlContent += `<v:rect style="position:absolute; left:${x}px; top:${y}px; width:1px; height:1px;" fillcolor="${fillColor}" stroked="false" />\n`;
+          }
         }
-    }
 
-    vmlContent += `</v:group>\n</xml>`;
+        vmlContent += `</v:group>\n</xml>`;
 
-    // Create a Blob with text/xml type
-    const blob = new Blob([vmlContent], { type: "plain/text" });
-    const url = URL.createObjectURL(blob);
+        // Create a Blob with correct MIME type
+        const blob = new Blob([vmlContent], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
 
-
-    // Optional: show VML in textarea
-    resultDiv.innerHTML = `
+        // Show VML preview and download link
+        resultDiv.innerHTML = `
         <textarea readonly style="width:100%; height:200px; background:#000; color:#0ff; border:2px solid #0ff; border-radius:10px; resize:none;">${vmlContent}</textarea>
-        <a href="${url}" download="${orginalName}.vml">Download VML</a>
-        `;
+        <a href="${url}" download="${originalName}.vml">Download VML</a>
+      `;
 
-    progressBar.style.display = "none";
-}
+        progressBar.style.display = "none";
+      };
+      img.src = URL.createObjectURL(file);
+      // ⚠ Stop further processing to prevent PNG from replacing it
+      return;
+    }
 
     // XML creation
     if (ext === "dds") {
@@ -473,7 +480,6 @@ if (mimeType === "application/vnd.ms-vml") {
       img.src = reader.result;
       return;
     }
-
 
     // === TSV Output ===
     if (ext === "tsv") {
@@ -1726,7 +1732,6 @@ function encodeQOI(imageData) {
 
   return new Blob([header, pixelData], { type: "image/qoi" });
 }
-
 
 // === Vectorization helper for SVG ===
 async function convertToVectorSVG(file, options = {}) {
