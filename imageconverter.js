@@ -103,8 +103,12 @@ function getMime(type) {
       return "image/x-icon";
     case "output-svg2":
       return "image/svg+xml";
+    case "output-xml":
+      return "text/xml";
+    case "output-json":
+      return "text/json";
     default:
-      return "Unknown";
+      return "unknown";
   }
 }
 
@@ -151,6 +155,10 @@ function getExt(type) {
       return "ico";
     case "output-svg2":
       return "svg2";
+    case "output-xml":
+      return "xml";
+    case "output-json":
+      return "json";
   }
 }
 // Convert Image Function
@@ -360,6 +368,38 @@ async function convertImage(file, mimeType, ext) {
 
   reader.onload = async () => {
     progressBar.value = 100;
+    // XML creation
+
+      if (ext === "xml") {
+  try {
+    const { svgString, url } = await convertToVectorSVG(file, {
+      ltres: 1,
+      qtres: 1,
+      pathomit: 8,
+      numberofcolors: 32,
+    });
+    const originalName = file.name.replace(/\.[^/.]+$/, "");
+
+    // Escape special characters if needed (optional, if you want to be safe)
+    const escapedSvg = svgString
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    resultDiv.innerHTML = `
+      <textarea readonly rows="20" cols="80" style="width:100%; font-family:monospace;">
+${svgString}
+      </textarea>
+      <br/>
+      <a href="${url}" download="${originalName}.xml">Download XML</a>
+    `;
+  } catch (err) {
+    alert("SVG conversion failed. Image may be too large or unsupported.");
+    console.error(err);
+  }
+  progressBar.style.display = "none";
+  return;
+}
+
     // === SVG Vectorization ===
     if (ext === "svg") {
       try {
@@ -506,6 +546,74 @@ async function convertImage(file, mimeType, ext) {
       img.src = reader.result;
       return;
     }
+    if (ext === "json") {
+  try {
+    const { svgString, url } = await convertToVectorSVG(file, {
+      ltres: 1,
+      qtres: 1,
+      pathomit: 8,
+      numberofcolors: 32,
+    });
+    const originalName = file.name.replace(/\.[^/.]+$/, "");
+
+    // Convert XML to JSON using DOMParser
+    function xmlToJson(xml) {
+      const obj = {};
+      if (xml.nodeType === 1) { // element
+        if (xml.attributes.length > 0) {
+          obj["@attributes"] = {};
+          for (let j = 0; j < xml.attributes.length; j++) {
+            const attribute = xml.attributes.item(j);
+            obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+          }
+        }
+      } else if (xml.nodeType === 3) { // text
+        return xml.nodeValue.trim();
+      }
+
+      // Process child nodes
+      if (xml.hasChildNodes()) {
+        for (let i = 0; i < xml.childNodes.length; i++) {
+          const item = xml.childNodes.item(i);
+          const nodeName = item.nodeName;
+          const value = xmlToJson(item);
+          if (value) {
+            if (obj[nodeName] === undefined) {
+              obj[nodeName] = value;
+            } else {
+              if (!Array.isArray(obj[nodeName])) {
+                obj[nodeName] = [obj[nodeName]];
+              }
+              obj[nodeName].push(value);
+            }
+          }
+        }
+      }
+      return obj;
+    }
+
+    // Parse the SVG string into XML DOM
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(svgString, "application/xml");
+    const jsonObj = xmlToJson(xmlDoc);
+    const jsonString = JSON.stringify(jsonObj, null, 2); // pretty print JSON
+
+    resultDiv.innerHTML = `
+      <textarea readonly rows="20" style="width:100%; font-family:monospace;">
+${jsonString}
+      </textarea>
+      <br/>
+      <a href="data:application/json;charset=utf-8,${encodeURIComponent(jsonString)}"
+         download="${originalName}.json">Download JSON</a>
+    `;
+  } catch (err) {
+    alert("SVG conversion failed. Image may be too large or unsupported.");
+    console.error(err);
+  }
+  progressBar.style.display = "none";
+  return;
+}
+
     if (ext === "tif") {
       const img = new Image();
       img.onload = () => {
