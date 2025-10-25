@@ -431,6 +431,7 @@ async function convertImage(file, mimeType, ext) {
       img.onload = () => {
         const width = img.width;
         const height = img.height;
+        const originalName = file.name.replace(/\.[^/.]+$/, "");
 
         const dataUrl = sharedCanvas.toDataURL("image/png");
         const vmlContent = `
