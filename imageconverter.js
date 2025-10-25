@@ -119,8 +119,6 @@ function getMime(type) {
       return "application/vnd.ms-vml";
     case "output-tsv":
       return "text/tab-separated-values";
-    case "output-vml":
-      return "vml";
     case "output-tsv":
       return "tsv";
 
@@ -184,6 +182,8 @@ function getExt(type) {
       return "tga";
     case "output-qoi":
       return "qoi";
+          case "output-vml":
+      return "vml";
     default:
       "unknown";
   }
