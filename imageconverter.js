@@ -925,7 +925,7 @@ ${jsonString}
         }
         sharedCtx.drawImage(img, 0, 0);
         const imageData = sharedCtx.getImageData(0, 0, img.width, img.height);
-        const blob = encodeRGBA(imageData);
+        const blob = encodeRGB(imageData);
         const url = URL.createObjectURL(blob);
         const originalName = file.name.replace(/\.[^/.]+$/, "");
         const dataURL = sharedCanvas.toDataURL("image/png");
