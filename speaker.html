@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speaker APP</title>
+  </head>
+  <body>
+    <script>
+      const name = "Robot";
+      const utterance = new SpeechSynthesisUtterance(
+        `Hello, My, Name, Is, ${name}`
+      );
+      utterance.volume = 0.1;
+      utterance.pitch = 2;
+      utterance.rate = 0.7;
+      utterance.lang = "en-UK";
+      window.onload = () => {
+        window.speechSynthesis.speak(utterance);
+      };
+    </script>
+  </body>
+</html>

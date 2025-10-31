@@ -1,0 +1,538 @@
+* {
+  box-sizing: border-box;
+}
+:root {
+  --primary-bg: #222;
+  --secondary-bg: #444;
+  --panel-bg: #181925;
+  --border-color: #666;
+  --accent1: #3399ff;
+  --accent2: #ff4444;
+  --accent3: #1ec8c8;
+  --text-color: #fff;
+  --status-bg: #16181fdd;
+  --btn-bg: #252837;
+  --btn-hover: #1ec8c8;
+  --btn-text: #fff;
+  --ui-radius: 16px;
+}
+body {
+  margin: 0;
+  background: var(--primary-bg);
+  color: var(--text-color);
+  font-family: "Segoe UI", Arial, sans-serif;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+body.light {
+  --primary-bg: #e6e6e6;
+  --secondary-bg: #fff;
+  --panel-bg: #f3f7fa;
+  --border-color: #c0c0c0;
+  --text-color: #191a22;
+  --status-bg: #fff9;
+  --btn-bg: #fff;
+  --btn-hover: #31c3ff;
+  --btn-text: #222;
+}
+#game {
+  position: relative;
+  width: 950px;
+  height: 440px;
+  margin: 48px auto 0 auto;
+  background: var(--secondary-bg);
+  border: 2.5px solid var(--border-color);
+  border-radius: var(--ui-radius);
+  box-shadow: 0 8px 24px 0 #0008;
+  overflow: hidden;
+}
+.player {
+  position: absolute;
+  width: 54px;
+  height: 108px;
+  border-radius: 14px;
+  bottom: 0;
+  box-shadow: 0 6px 16px 0 #0005, 0 0 8px 2px #1ec8c866;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s;
+}
+#player1 {
+  background: linear-gradient(120deg, #3399ff 40%, #0066cc 100%);
+  box-shadow: 0 0 16px 5px #44c7ffbb;
+}
+#player2 {
+  background: linear-gradient(120deg, #ff4444 40%, #cc0000 100%);
+  box-shadow: 0 0 16px 5px #ff6b6bbb;
+}
+.arm {
+  position: absolute;
+  width: 15px;
+  height: 40px;
+  top: 28px;
+  background: #23263d;
+  border-radius: 6px;
+  opacity: 0.92;
+  box-shadow: 0 2px 7px 1px #0004;
+  z-index: 2;
+  transition: transform 0.5s !important;
+}
+.arm.left {
+  left: -2px;
+  transform-origin: top right;
+}
+.arm.right {
+  right: -2px;
+  transform-origin: top left;
+}
+.attacking.left {
+  transform: rotate(-70deg) scaleY(1.18);
+  background: #e1f7ff;
+}
+.attacking.right {
+  transform: rotate(70deg) scaleY(1.18);
+  background: #ffe1e1;
+}
+.sword {
+  display: none;
+  position: absolute;
+  width: 10px;
+  height: 55px;
+  background: linear-gradient(180deg, #fff 70%, #aaa 100%);
+  border: 2px solid #99e;
+  border-radius: 5px 5px 11px 11px;
+  left: 50%;
+  top: 50px;
+  transform: translateX(-50%);
+  z-index: 4;
+  box-shadow: 0 0 20px 2px #acf9;
+  transition: transform 0.5s !important;
+}
+.sword.active {
+  display: block;
+  animation: swordslash 0.2s;
+}
+@keyframes swordslash {
+  0% {
+    transform: translateX(-50%) rotate(-70deg);
+  }
+  100% {
+    transform: translateX(-50%) rotate(25deg);
+  }
+}
+.shield-glow {
+  box-shadow: 0 0 18px 8px var(--accent3), 0 0 0 2px #b7e0e8;
+  outline: 2px solid #1ec8c8;
+}
+.fireball,
+.bullet,
+.bomb,
+.laser,
+.boomerang,
+.freeze-ray,
+.heal-effect {
+  position: absolute;
+  z-index: 12;
+}
+.fireball {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+.fireball.blue {
+  background: radial-gradient(circle at 50% 20%, #ffe 70%, orange 98%);
+  box-shadow: 0 0 12px 5px orange;
+  border: 2px solid #ffb236;
+}
+.fireball.red {
+  background: radial-gradient(circle at 40% 50%, #fff 55%, orangered 98%);
+  box-shadow: 0 0 12px 5px #ff3838;
+  border: 2px solid #ff3838;
+}
+.bullet {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.bullet.blue {
+  background: radial-gradient(circle at 70% 40%, #fff 60%, #ffe629 98%);
+  box-shadow: 0 0 10px 4px #ffe629b0;
+  border: 2px solid #ffe629;
+}
+.bullet.red {
+  background: radial-gradient(circle at 70% 40%, #fff 60%, gold 98%);
+  box-shadow: 0 0 10px 4px gold;
+  border: 2px solid gold;
+}
+.bomb {
+  background: radial-gradient(circle at 8px 8px, #fff 60%, #333 100%);
+  border: 2.5px solid #222;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  box-shadow: 0 0 16px 8px #ff0c;
+  z-index: 5;
+}
+.bomb-timer {
+  position: absolute;
+  color: #ff0;
+  font-size: 16px;
+  left: 5px;
+  top: 3px;
+  pointer-events: none;
+  text-shadow: 0 0 2px #000, 0 0 7px #ff0;
+  font-family: monospace;
+}
+.laser {
+  /* thin bright core + glow using pseudo-elements */
+  position: absolute;
+  height: 2px; /* thin beam */
+  width: 340px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 30, 30, 1) 40%,
+    rgba(255, 30, 30, 1) 60%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  box-shadow: 0 0 18px 6px rgba(255, 30, 30, 0.65),
+    0 0 36px 14px rgba(255, 80, 80, 0.18);
+  z-index: 20;
+  overflow: visible;
+  animation: laser-blast 0.12s ease-out;
+}
+
+/* thin bright core (sharp) */
+.laser::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+  background: rgba(255, 220, 220, 0.98);
+  box-shadow: 0 0 8px 2px rgba(255, 200, 200, 0.95);
+  pointer-events: none;
+}
+
+/* softer colored glow */
+.laser::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 8px;
+  transform: translateY(-50%);
+  background: transparent;
+  box-shadow: 0 0 22px 10px rgba(255, 40, 40, 0.55);
+  filter: blur(4px);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+/* Keep blue lasers (player 1) looking cyan/blue */
+.laser.blue {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(30, 200, 255, 1) 40%,
+    rgba(30, 200, 255, 1) 60%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  box-shadow: 0 0 18px 6px rgba(30, 200, 255, 0.55),
+    0 0 36px 14px rgba(30, 200, 255, 0.12);
+}
+.laser.blue::after {
+  box-shadow: 0 0 22px 10px rgba(30, 200, 255, 0.5);
+}
+.laser.blue::before {
+  background: rgba(220, 245, 255, 0.98);
+  box-shadow: 0 0 8px 2px rgba(200, 240, 255, 0.95);
+}
+
+/* Red laser override (player 2) */
+.laser.red {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 68, 68, 1) 40%,
+    rgba(255, 68, 68, 1) 60%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  box-shadow: 0 0 18px 6px rgba(255, 68, 68, 0.75),
+    0 0 40px 18px rgba(255, 80, 80, 0.25);
+}
+.laser.red::after {
+  box-shadow: 0 0 28px 12px rgba(255, 68, 68, 0.6);
+}
+.laser.red::before {
+  background: rgba(255, 230, 230, 0.98);
+  box-shadow: 0 0 8px 2px rgba(255, 180, 180, 0.95);
+}
+
+@keyframes laser-blast {
+  from {
+    opacity: 0;
+    transform: scaleX(0.96);
+  }
+  60% {
+    opacity: 1;
+    transform: scaleX(1.02);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+.boomerang {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px 6px 16px 6px;
+  background: linear-gradient(120deg, #ffe629 70%, #222 100%);
+  box-shadow: 0 0 10px 4px #ffe629b0;
+  border: 2.5px solid #ffe629;
+  transform: rotate(40deg);
+  animation: spin-boom 0.8s linear infinite;
+}
+@keyframes spin-boom {
+  100% {
+    transform: rotate(400deg);
+  }
+}
+.freeze-ray {
+  width: 18px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #b3f4ff 60%, #0488fc 100%);
+  border: 2px solid #24e5ff;
+  box-shadow: 0 0 16px 6px #1ec8c8b8;
+}
+.heal-effect {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #6fffbe 60%, #11c899 100%);
+  box-shadow: 0 0 20px 8px #1ec8c866;
+  border: 2px solid #1ec8c8;
+  animation: heal-pulse 0.5s;
+}
+@keyframes heal-pulse {
+  0% {
+    opacity: 0.2;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+#health1,
+#health2 {
+  position: absolute;
+  height: 30px;
+  width: 260px;
+  background: #333;
+  border: 2.5px solid var(--border-color);
+  border-radius: 13px;
+  top: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px 0 #0003;
+}
+#health1 {
+  left: 30px;
+}
+#health2 {
+  right: 30px;
+}
+.health-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to right, #31ff8c, #18e7e7 80%);
+  border-radius: 11px;
+  transition: width 0.3s;
+  box-shadow: 0 0 6px 0 #17efc7aa;
+}
+#health2 .health-fill {
+  background: linear-gradient(to right, #ffb031, #ff5163 80%);
+}
+#status {
+  text-align: center;
+  margin-top: 18px;
+  background: var(--status-bg);
+  border-radius: 10px;
+  padding: 10px 0 7px 0;
+  width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: 500;
+  box-shadow: 0 4px 18px 0 #0004;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+}
+#winnerLabel {
+  color: #1ec8c8;
+  background: #23263d;
+  border-radius: 10px;
+  padding: 8px 0;
+  width: 400px;
+  margin: 18px auto 0 auto;
+  box-shadow: 0 3px 14px 0 #0005;
+  transition: background 0.2s, color 0.2s;
+}
+#restart {
+  display: none;
+  margin: 20px auto 0 auto;
+  padding: 11px 34px;
+  font-size: 19px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  box-shadow: 0 3px 14px 0 #0005;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#restart:hover {
+  background: var(--btn-hover);
+  color: #fff;
+}
+#helpBtn,
+#settingsBtn {
+  position: absolute;
+  top: 18px;
+  padding: 8px 22px;
+  z-index: 1000;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  box-shadow: 0 2px 10px 0 #0004;
+  transition: background 0.2s, color 0.2s;
+}
+#helpBtn {
+  left: 50%;
+  transform: translateX(-50%);
+}
+#settingsBtn {
+  left: calc(50% + 130px);
+  transform: translateX(-50%);
+}
+#helpBtn:hover,
+#settingsBtn:hover {
+  background: var(--btn-hover);
+  color: #fff;
+}
+#help-screen,
+#settings-screen,
+#ai-difficulty-screen {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--panel-bg);
+  color: var(--text-color);
+  z-index: 1001;
+  padding: 50px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  border-radius: var(--ui-radius);
+  box-shadow: 0 10px 40px #0006;
+  font-size: 18px;
+  animation: fadeIn 0.2s;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+#help-screen h2,
+#settings-screen h2,
+#ai-difficulty-screen h2 {
+  text-align: center;
+  font-size: 2.3em;
+  margin-bottom: 16px;
+  color: var(--accent3);
+  letter-spacing: 0.5px;
+}
+#backBtn,
+#settingsBackBtn,
+#aiDifficultyBackBtn {
+  margin-top: 32px;
+  padding: 12px 32px;
+  font-size: 19px;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  box-shadow: 0 3px 14px 0 #0004;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+#backBtn:hover,
+#settingsBackBtn:hover,
+#aiDifficultyBackBtn:hover {
+  background: #1ec8c8 !important;
+  color: #fff;
+}
+.setting-item {
+  margin: 22px 0;
+  padding: 0 10px;
+}
+.setting-item label {
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  margin-right: 10px;
+  transform: scale(1.3);
+  cursor: pointer;
+}
+.radio-group {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.toggle-label {
+  font-size: 20px;
+  font-weight: 500;
+}
+#aiSettingsBtn:hover {
+  background-color: var(--btn-hover) !important;
+  color: white;
+}
+#aiSettingsBtn {
+  cursor: pointer;
+}
+::selection {
+  background: white;
+  color: black;
+}
+:checked {
+  background: white;
+  color: black;
+}

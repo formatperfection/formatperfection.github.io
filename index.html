@@ -1,0 +1,270 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta charset="UTF-8" />
+    <link rel="icon" href="icons/icon.png" />
+    <style>
+      @import url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css);
+      @import url("assets/Orbitron.css"); /* Reset & base */
+      * {
+        box-sizing: border-box;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #0f0f20;
+        font-family: "Orbitron", "Segoe UI", sans-serif;
+        color: #00fff7;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+      .container {
+        animation: fadeIn 0.6s ease;
+        font-family: "Orbitron", "Segoe UI", sans-serif;
+        background: #111122;
+        border: 2px solid #00fff7;
+        border-radius: 12px;
+        padding: 2.5rem 2rem 3rem;
+        width: 400px;
+        box-shadow: 0 0 30px #00fff7;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      h1 {
+        margin-bottom: 1.5rem;
+        text-shadow: 0 0 12px #00fff7;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+      }
+      label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+      }
+      .file-input-wrapper {
+        position: relative;
+        width: 100%;
+        margin-bottom: 1.5rem;
+      }
+      input[type="file"] {
+        opacity: 0;
+        width: 100%;
+        height: 45px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        cursor: pointer;
+      }
+      .file-input-label {
+        border: 1.5px solid #00fff7;
+        padding: 0.8rem 1rem;
+        border-radius: 8px;
+        background: #0f0f20;
+        color: #00fff7;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-block;
+        width: 100%;
+        user-select: none;
+        transition: background 0.3s ease, color 0.3s ease;
+        text-align: center;
+        box-shadow: 0 0 15px #00fff7;
+      }
+      .file-input-label:hover {
+        background: #00fff7;
+        color: #0f0f20;
+        box-shadow: 0 0 25px #00fff7;
+      }
+      select {
+        width: 100%;
+        font-family: "Orbitron", "Segoe UI", sans-serif;
+        padding: 0.6rem 1rem;
+        font-size: 1rem;
+        border-radius: 8px;
+        border: 1.5px solid #00fff7;
+        background: #0f0f20;
+        color: #00fff7;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 0 15px #00fff7 inset;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        text-align: center;
+      }
+      button,
+      .button {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1.1rem;
+        background: #00fff7;
+        border: none;
+        color: #0f0f20;
+        font-weight: 700;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 0 20px #00fff7;
+        transition: background 0.3s ease;
+        margin-bottom: 20px;
+      }
+      button:hover,
+      .button:hover {
+        background: #00c6b6;
+      }
+      .note {
+        font-size: 0.85rem;
+        color: #0ff;
+        margin: 1rem 0 1.5rem 0;
+      }
+      #result {
+        width: 100%;
+        margin-top: 1rem;
+      }
+      #result img,
+      #result svg,
+      #result iframe {
+        max-width: 100%;
+        max-height: 320px;
+        border: 2px solid #00fff7;
+        border-radius: 12px;
+        box-shadow: 0 0 20px #00fff7;
+      }
+      a {
+        display: inline-block;
+        margin-top: 0.75rem;
+        color: #0ff;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+      a:hover {
+        color: #00fff7;
+        text-shadow: 0 0 8px #00fff7;
+      }
+      option {
+        font-family: "Orbitron", "Segoe UI", sans-serif;
+      }
+      @media (max-width: 400px) {
+        .container {
+          font-size: 12px;
+          padding: 5px;
+          width: 100%;
+        }
+      }
+      @media (max-width: 240px) {
+        .container {
+          font-size: 12px;
+          padding: 5px;
+          width: 100%;
+        }
+      }
+      @media (max-width: 239px) {
+        .container {
+          font-size: 10px;
+          padding: 3px;
+          width: 100%;
+        }
+      }
+      @media (max-width: 150px) {
+        .container {
+          font-size: 8px;
+          padding: 5px;
+          width: 100%;
+        }
+      }
+      option {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+      }
+      input[type="file"] {
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+    <title>FormatPerfection</title>
+    <link rel="manifest" href="manifest.json" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome To FormatPerfection</h1>
+      <a href="imageconverter.html" class="button" target="_blank">
+        Try Image Converter
+      </a>
+      <!-- <a href="videoconverter.html" class="button" target="_blank">Try Video Converter</a> -->
+
+      <a href="pdfmerger.html" class="button" target="_blank">
+        Try PDF Merger
+      </a>
+      <a href="pdfsplitter.html" class="button" target="_blank">
+        Try PDF Splitter
+      </a>
+      <!-- <a href="pdfeditor.html" class="button" target="_blank">Try PDF Editor</a> -->
+      <a href="paddle.html" class="button" target="_blank"> Ping Pong Game </a>
+      <a href="fight.html" class="button" target="_blank"> Fighting Game </a>
+      <!-- <a href="info.html" class="button" target="_blank"> Information Generator </a> -->
+      <a href="painxl.html" class="button" target="_blank"
+        >PAINXL Language Tutorial</a
+      >
+      <a href="squaregame.html" class="button" target="_blank"> SquareGame </a>
+      <a href="add.html" class="button" target="_blank">A Mathematical Game</a>
+      <!-- <a class="button" href="dist-linux.zip" download="dist-linux.zip"
+        >Download Desktop For Linux</a
+      > -->
+      <!-- <a href="dist-windows.zip" download="dist-windows.zip" -->
+      <!-- >Download Desktop For Windows</a -->
+      <!-- > -->
+    </div>
+
+    <button
+      id="closeIframe"
+      style="
+        display: none;
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        padding: 10px 15px;
+        background: #00fff7;
+        color: #0f0f20;
+        font-weight: 700;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        z-index: 9999;
+        box-shadow: 0 0 15px #00fff7;
+      "
+    >
+      X
+    </button>
+
+    <iframe
+      id="iframe"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+      "
+    ></iframe>
+    <script src="script.js"></script>
+  </body>
+</html>

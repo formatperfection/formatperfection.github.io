@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Free Image Converter</title>
+
+    <!-- <link rel="stylesheet" href="imageconverter.css" /> -->
+  </head>
+  <style>
+    @import url("assets/Orbitron.css"); /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #0f0f20;
+      font-family: "Orbitron", "Segoe UI", sans-serif;
+      color: #00fff7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .container {
+      animation: fadeIn 0.6s ease;
+      font-family: "Orbitron", "Segoe UI", sans-serif;
+      background: #111122;
+      border: 2px solid #00fff7;
+      border-radius: 12px;
+      padding: 2.5rem 2rem 3rem;
+      width: 400px;
+      box-shadow: 0 0 30px #00fff7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin-bottom: 1.5rem;
+      text-shadow: 0 0 12px #00fff7;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+    }
+    label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .file-input-wrapper {
+      position: relative;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    input[type="file"] {
+      opacity: 0;
+      width: 100%;
+      height: 45px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      cursor: pointer;
+    }
+    .file-input-label {
+      border: 1.5px solid #00fff7;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      background: #0f0f20;
+      color: #00fff7;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-block;
+      width: 100%;
+      user-select: none;
+      transition: background 0.3s ease, color 0.3s ease;
+      text-align: center;
+      box-shadow: 0 0 15px #00fff7;
+    }
+    .file-input-label:hover {
+      background: #00fff7;
+      color: #0f0f20;
+      box-shadow: 0 0 25px #00fff7;
+    }
+    select {
+      width: 100%;
+      font-family: "Orbitron", "Segoe UI", sans-serif;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1.5px solid #00fff7;
+      background: #0f0f20;
+      color: #00fff7;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 15px #00fff7 inset;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+    }
+    button,
+    .button {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1.1rem;
+      background: #00fff7;
+      border: none;
+      color: #0f0f20;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 20px #00fff7;
+      transition: background 0.3s ease;
+    }
+    button:hover,
+    .button:hover {
+      background: #00c6b6;
+    }
+    .note {
+      font-size: 0.85rem;
+      color: #0ff;
+      margin: 1rem 0 1.5rem 0;
+    }
+    #result {
+      width: 100%;
+      margin-top: 1rem;
+    }
+    #result img,
+    #result svg,
+    #result iframe {
+      max-width: 100%;
+      max-height: 320px;
+      border: 2px solid #00fff7;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00fff7;
+    }
+    a {
+      display: inline-block;
+      margin-top: 0.75rem;
+      color: #0ff;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    a:hover {
+      color: #00fff7;
+      text-shadow: 0 0 8px #00fff7;
+    }
+    option {
+      font-family: "Orbitron", "Segoe UI", sans-serif;
+    }
+    @media (max-width: 400px) {
+      .container {
+        font-size: 12px;
+        padding: 5px;
+        width: 100%;
+      }
+    }
+    @media (max-width: 240px) {
+      .container {
+        font-size: 12px;
+        padding: 5px;
+        width: 100%;
+      }
+    }
+    @media (max-width: 239px) {
+      .container {
+        font-size: 10px;
+        padding: 3px;
+        width: 100%;
+      }
+    }
+    @media (max-width: 150px) {
+      .container {
+        font-size: 8px;
+        padding: 5px;
+        width: 100%;
+      }
+    }
+    option {
+      display: flex;
+      justify-content: center;
+      text-align: center;
+    }
+    input[type="file"] {
+      display: flex;
+      justify-content: center;
+    }
+    .quality-container {
+      margin-top: 10px;
+      text-align: center;
+      color: #0ff;
+      font-family: "Orbitron", sans-serif;
+    }
+
+    #quality {
+      width: 60%;
+      margin-top: 5px;
+      accent-color: #0ff;
+      cursor: pointer;
+    }
+
+    #quality-value {
+      font-weight: bold;
+      color: #0ff;
+    }
+  </style>
+  <link rel="icon" href="icons/icon.png" />
+  <body>
+    <div
+      id="overlay"
+      style="
+        width: 100%;
+        height: 100%;
+        z-index: 1202131321;
+        background-color: #ffffff;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        opacity: 0.6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        text-align: center;
+        flex-direction: column;
+        color: black;
+        display: none !important;
+        transition: 0.5;
+        font-size: 2rem;
+      "
+    >
+      Drop Images here
+    </div>
+    <div class="container">
+      <h1>Image Converter</h1>
+      <label for="fileInput"
+        >Choose a file (SVG, PNG, JPEG, WebP Or any image format), your input
+        type is detected automatically:</label
+      >
+      <div class="file-input-wrapper">
+        <label class="file-input-label" for="fileInput" id="fileInputLabel"
+          >Select File</label
+        >
+        <input type="file" id="fileInput" accept="image/*" />
+      </div>
+      <label for="outputDiv">Output Format:</label>
+      <select id="outputDiv">
+        <!-- <option value="output-avif">AVIF</option> -->
+        <optgroup label="Common Formats">
+          <option value="output-bmp">BMP</option>
+          <option value="output-jpeg">JPEG</option>
+          <option value="output-png">PNG</option>
+          <option value="output-gif">GIF</option>
+          <option value="output-utif">TIFF</option>
+          <option value="output-ico">ICO</option>
+          <option value="output-webp">WebP</option>
+          <option value="output-pdf">PDF</option>
+          <option value="output-svg">SVG</option>
+        </optgroup>
+        <optgroup label="Developer Formats">
+          <option value="output-base64">Base64</option>
+          <option value="output-canvas">Canvas</option>
+          <!-- <option value="output-flif">FLIF</option> -->
+          <option value="output-html">HTML</option>
+          <option value="output-json">JSON</option>
+          <option value="output-rgb">RGB</option>
+          <option value="output-rgba">RGBA</option>
+          <option value="output-tsv">TSV</option>
+          <option value="output-vml">VML</option>
+          <option value="output-xml">XML</option>
+        </optgroup>
+        <optgroup label="Uncommon Formats">
+          <option value="output-dds">DDS</option>
+          <option value="output-ppm">PPM</option>
+          <option value="output-pgm">PGM</option>
+          <option value="output-pbm">PBM</option>
+          <option value="output-qoi">QOI</option>
+          <!-- <option value="output-svg2">SVG Variant</option> -->
+          <option value="output-tga">TGA</option>
+        </optgroup>
+      </select>
+      <!-- 
+        | Format           | File extension   | MIME type                  | Notes                                              |
+        | ---------------- | ---------------- | -------------------------- | -------------------------------------------------- |
+        | TIFF / TIF       | `.tif` / `.tiff` | `image/tiff`               | Lossless RGBA, already in your code (`encodeTIFF`) |
+        | BMP              | `.bmp`           | `image/bmp`                | Uncompressed RGB/RGBA (`encodeBMP`)                |
+        | PPM (color)      | `.ppm`           | `image/x-portable-pixmap`  | ASCII or binary, simple RGB                        |
+        | PGM (grayscale)  | `.pgm`           | `image/x-portable-graymap` | ASCII or binary, grayscale only                    |
+        | PBM (monochrome) | `.pbm`           | `image/x-portable-bitmap`  | ASCII or binary, black/white only                  |
+        | RAW RGB          | `.rgb`           | `application/octet-stream` | Raw RGB bytes                                      |
+        | RAW RGBA         | `.rgba`          | `application/octet-stream` | Raw RGBA bytes                                     |
+        | GIF (static)     | `.gif`           | `image/gif`                | Limited palette, transparency via GIF.js if needed |
+        
+      -->
+      <div class="quality-container">
+        <label for="quality"> Quality:<br /></label>
+        <input
+          type="range"
+          id="quality"
+          min="0"
+          max="1"
+          step="0.01"
+          value="1"
+        />
+      </div>
+      <div class="quality-container">
+        <label>
+          <input type="checkbox" id="transparentBg" checked />
+          Transparent Background
+        </label>
+      </div>
+
+      <button id="convertBtn">Convert</button>
+      <div class="note">
+        Instead of visiting paid sites this is completely free, private,
+        mobile-friendly, local, and with no ads.
+      </div>
+      <div id="result">
+        <a class="button" href="pdfmerger.html" target="_blank"
+          >Try PDF Merger</a
+        >
+        <a class="button" href="pdfsplitter.html" target="_blank"
+          >Try PDF Splitter</a
+        >
+        <a
+          class="button"
+          href="mailto:moaz96526@gmail.com?subject=New%20Suggestion%20For%20The%20Image%20Converter"
+          target="_blank"
+          >Suggestions</a
+        >
+        <!-- <a href="chatgpt.com" class="button" target="_blank">ChatGPT</a> -->
+        <progress
+          id="progressBar"
+          value="0"
+          max="100"
+          style="width: 100%; height: 30px; display: none"
+        ></progress>
+      </div>
+    </div>
+    <!-- <script src="assets/html2canvas.min.js.js"></script> -->
+    <!-- <script src="assets/jspdf.umd.min.js.js"></script> -->
+    <script src="assets/pdf-lib/dist/pdf-lib.min.js"></script>
+    <!-- <script src="assets/pdf.min.mjs.mjs"></script> -->
+    <script src="assets/gif.js/dist/gif.worker.js"></script>
+    <script src="assets/gif.js/dist/gif.js"></script>
+    <script src="assets/imagetracer_v1.2.6.js"></script>
+    <script src="assets/UTIF.min.js"></script>
+    <script src="assets/libheif.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/libheif-js@1.19.8/libheif-wasm/libheif-bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+
+    <!-- Use the WASM bundle of libheif-js -->
+    <script>
+      let heifModule = null;
+
+      (async () => {
+        try {
+          heifModule = await libheif(); // load WASM
+          console.log("✅ libheif-js initialized");
+        } catch (err) {
+          console.error("❌ Failed to initialize libheif-js:", err);
+        }
+      })();
+    </script>
+
+    <script src="assets/heic2any.min.js"></script>
+    <script src="imageconverter.js"></script>
+    <script></script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "Format Perfection",
+  "short_name": "CFStudio",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0f0f20",
+  "theme_color": "#00fff7",
+  "description": "All your file format tools, and games in one place.",
+  "icons": [
+    {
+      "src": "icons/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-2.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

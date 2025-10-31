@@ -1,0 +1,212 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SquareGame(Browser)</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: black;
+    color: white;
+    font-family: Consolas, monospace;
+  }
+  #restartBtn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, 0);
+    width: 120px;
+    height: 40px;
+    font-size: 16px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+<button id="restartBtn">Restart</button>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const restartBtn = document.getElementById("restartBtn");
+
+const SQUARE_SIZE = 40;
+const TIME_LIMIT = 10;
+const SPEED_START = 150; // pixels per second
+let speed = SPEED_START;
+let score = 0;
+let highScore = parseInt(localStorage.getItem("highScore") || "0");
+let countdown = TIME_LIMIT;
+let running = true;
+
+let x = 0, y = 0;
+let dir = "RIGHT";
+let rand_dx = SPEED_START, rand_dy = SPEED_START;
+let lastTime = 0;
+let elapsedSinceClick = 0;
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+document.body.style.cursor = "crosshair";
+
+canvas.addEventListener("mousedown", e => {
+  if (!running) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+
+  if (mx >= x && mx <= x + SQUARE_SIZE && my >= y && my <= y + SQUARE_SIZE) {
+    speed += 40;
+    score++;
+    elapsedSinceClick = 0;
+
+    if (score === 15) {
+      rand_dx = (Math.random() < 0.5 ? -1 : 1) * speed;
+      rand_dy = (Math.random() < 0.5 ? -1 : 1) * speed;
+    }
+  }
+});
+
+restartBtn.addEventListener("click", restartGame);
+
+function restartGame() {
+  x = 0;
+  y = 0;
+  dir = "RIGHT";
+  score = 0;
+  countdown = TIME_LIMIT;
+  speed = SPEED_START;
+  running = true;
+  restartBtn.style.display = "none";
+  document.body.style.cursor = "crosshair";
+  elapsedSinceClick = 0;
+  rand_dx = (Math.random() < 0.5 ? -1 : 1) * speed;
+  rand_dy = (Math.random() < 0.5 ? -1 : 1) * speed;
+  requestAnimationFrame(gameLoop);
+}
+
+function gameLoop(timestamp) {
+  if (!lastTime) lastTime = timestamp;
+  const deltaTime = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+
+  if (!running) return;
+
+  elapsedSinceClick += deltaTime;
+  countdown = Math.max(0, TIME_LIMIT - Math.floor(elapsedSinceClick));
+
+  if (countdown <= 0) {
+    gameOver();
+    return;
+  }
+  if (score >= 50) {
+  winGame();
+  return;
+}
+
+  const winWidth = canvas.width;
+  const winHeight = canvas.height;
+
+  if (score < 15) {
+    switch (dir) {
+      case "RIGHT":
+        x += speed * deltaTime;
+        if (x + SQUARE_SIZE >= winWidth) {
+          x = winWidth - SQUARE_SIZE;
+          dir = "DOWN";
+        }
+        break;
+      case "DOWN":
+        y += speed * deltaTime;
+        if (y + SQUARE_SIZE >= winHeight) {
+          y = winHeight - SQUARE_SIZE;
+          dir = "LEFT";
+        }
+        break;
+      case "LEFT":
+        x -= speed * deltaTime;
+        if (x <= 0) {
+          x = 0;
+          dir = "UP";
+        }
+        break;
+      case "UP":
+        y -= speed * deltaTime;
+        if (y <= 30) {
+          y = 30;
+          dir = "RIGHT";
+        }
+        break;
+    }
+  } else {
+    x += rand_dx * deltaTime;
+    y += rand_dy * deltaTime;
+    if (x <= 0 || x + SQUARE_SIZE >= winWidth) rand_dx *= -1;
+    if (y <= 30 || y + SQUARE_SIZE >= winHeight - 30) rand_dy *= -1;
+  }
+
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const winWidth = canvas.width;
+
+  ctx.fillStyle = "white";
+  ctx.font = "16px Consolas";
+  ctx.fillText("Time left: " + countdown, 10, 20);
+  ctx.fillText("Score: " + score, winWidth - 120, 20);
+  ctx.fillText("High Score: " + highScore, winWidth / 2 - 60, 20);
+
+  ctx.fillRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
+}
+
+function gameOver() {
+  running = false;
+  document.body.style.cursor = "default";
+
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem("highScore", highScore);
+  }
+
+  restartBtn.style.display = "block";
+
+  ctx.fillStyle = "white";
+  ctx.font = "18px Consolas";
+  ctx.fillText("Game Over", canvas.width / 2 - 60, canvas.height / 2 - 80);
+  ctx.fillText("Score: " + score, canvas.width / 2 - 60, canvas.height / 2 - 60);
+  ctx.fillText("High Score: " + highScore, canvas.width / 2 - 60, canvas.height / 2 - 40);
+}
+function winGame() {
+  running = false;
+  document.body.style.cursor = "default";
+
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem("highScore", highScore);
+  }
+
+  restartBtn.style.display = "block";
+
+  ctx.fillStyle = "white";
+  ctx.font = "24px Consolas";
+  ctx.fillText("🎉 YOU WIN! 🎉", canvas.width / 2 - 80, canvas.height / 2 - 80);
+  ctx.fillText("Final Score: " + score, canvas.width / 2 - 80, canvas.height / 2 - 50);
+  ctx.fillText("High Score: " + highScore, canvas.width / 2 - 80, canvas.height / 2 - 20);
+}
+
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>

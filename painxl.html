@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learn PAINXL Tutorial & Interpreter</title>
+    <link rel="icon" href="icons/icon.png" />
+    <!-- <style>
+      :root {
+        --bg: #f9f9f9;
+        --text: #222;
+        --btn-bg: #eee;
+        --btn-hover-bg: #ddd;
+        --accent: #0066cc;
+        --memory-cell-bg: #fff;
+        --memory-pointer-bg: #cce6ff;
+      }
+      body.dark {
+        --bg: #1e1e1e;
+        --text: #ddd;
+        --btn-bg: #333;
+        --btn-hover-bg: #444;
+        --accent: #3399ff;
+        --memory-cell-bg: #2a2a2a;
+        --memory-pointer-bg: #3a72d1;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 1rem;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      h1,
+      h2,
+      h3 {
+        margin-top: 0;
+      }
+      .container {
+        max-width: 800px;
+        width: 100%;
+      }
+      .lesson-text {
+        white-space: pre-wrap;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        line-height: 1.4;
+      }
+      button.btn {
+        background: var(--btn-bg);
+        border: 1px solid #999;
+        padding: 0.4rem 0.9rem;
+        margin: 0.2rem;
+        border-radius: 3px;
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--text);
+      }
+      button.btn:hover {
+        background: var(--btn-hover-bg);
+      }
+      button.btn:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      #progress-container {
+        width: 100%;
+        height: 18px;
+        background: #ccc;
+        border-radius: 9px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+      }
+      #progress-fill {
+        height: 100%;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+      #content-area {
+        background: var(--memory-cell-bg);
+        border-radius: 6px;
+        padding: 1rem;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+      }
+      textarea {
+        width: 100%;
+        font-family: monospace;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 4px;
+        border: 1px solid #aaa;
+        padding: 0.4rem;
+        background: var(--bg);
+        color: var(--text);
+        resize: vertical;
+      }
+      #painxl-editor {
+        height: 150px;
+      }
+      #input-textarea {
+        height: 40px;
+      }
+      #output-console {
+        min-height: 60px;
+        background: #222;
+        color: #0f0;
+        font-family: monospace;
+        padding: 0.5rem;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+      #memory-visualizer {
+        margin-top: 1rem;
+        font-family: monospace;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        border: 1px solid #999;
+        padding: 0.2rem;
+        border-radius: 4px;
+        user-select: none;
+        background: var(--memory-cell-bg);
+      }
+      .memory-cell {
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+        border: 1px solid #aaa;
+        margin-right: 2px;
+        text-align: center;
+        border-radius: 3px;
+        background: var(--memory-cell-bg);
+        color: var(--text);
+      }
+      .memory-cell.pointer {
+        background: var(--memory-pointer-bg);
+        font-weight: 700;
+      }
+      label {
+        font-weight: 600;
+        display: block;
+        margin-top: 1rem;
+      }
+      .control-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .control-row > * {
+        margin-right: 0.5rem;
+      }
+      .quiz-question-block {
+        margin-bottom: 1rem;
+      }
+      .quiz-question {
+        font-weight: 700;
+      }
+      .quiz-options label {
+        display: block;
+        margin-left: 1rem;
+        cursor: pointer;
+      }
+      #dark-mode-toggle {
+        position: fixed;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: var(--btn-bg);
+        border: 1px solid #999;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+        cursor: pointer;
+        user-select: none;
+      }
+    </style> -->
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap");
+      :root {
+        --bg: #0f0f1e;
+        --text: #c0ffee;
+        --btn-bg: #003344;
+        --btn-hover-bg: #005577;
+        --accent: #00ffcc;
+        --highlight: #00ffee;
+        --memory-cell-bg: #0a0a20;
+        --memory-pointer-bg: #005577;
+      }
+      body.dark {
+        --bg: #000814;
+        --text: #00d4ff;
+        --btn-bg: #001f3f;
+        --btn-hover-bg: #004080;
+        --accent: #00ffdc;
+        --memory-cell-bg: #090a1d;
+        --memory-pointer-bg: #003060;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Orbitron", monospace;
+        margin: 0;
+        padding: 1rem;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: background 0.3s, color 0.3s;
+      }
+      h1,
+      h2,
+      h3 {
+        color: var(--highlight);
+        margin-top: 0;
+      }
+      .container {
+        max-width: 800px;
+        width: 100%;
+      }
+      .lesson-text {
+        white-space: pre-wrap;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        line-height: 1.4;
+      }
+      button.btn {
+        background: var(--btn-bg);
+        color: var(--text);
+        border: 1px solid var(--accent);
+        padding: 0.5rem 1rem;
+        margin: 0.2rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        text-shadow: 0 0 5px var(--accent);
+        box-shadow: 0 0 8px var(--accent);
+        transition: background 0.2s;
+      }
+      button.btn:hover {
+        background: var(--btn-hover-bg);
+      }
+      button.btn:disabled {
+        opacity: 0.4;
+        cursor: default;
+        box-shadow: none;
+      }
+      #progress-container {
+        width: 100%;
+        height: 18px;
+        background: #333;
+        border-radius: 9px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        box-shadow: 0 0 5px var(--accent);
+      }
+      #progress-fill {
+        height: 100%;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+      #content-area {
+        background: var(--memory-cell-bg);
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 0 12px rgba(0, 255, 204, 0.5);
+      }
+      textarea {
+        width: 100%;
+        font-family: monospace;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 4px;
+        border: 1px solid var(--accent);
+        padding: 0.5rem;
+        background: #0a0a20;
+        color: var(--text);
+        resize: vertical;
+        box-shadow: inset 0 0 5px var(--accent);
+      }
+      #bf-editor {
+        height: 150px;
+      }
+      #input-textarea {
+        height: 40px;
+        resize: horizontal;
+      }
+      #output-console {
+        min-height: 60px;
+        background: #001122;
+        color: #00ff22;
+        font-family: monospace;
+        padding: 0.5rem;
+        border-radius: 4px;
+        overflow-x: auto;
+        box-shadow: inset 0 0 5px var(--accent);
+      }
+      #memory-visualizer {
+        margin-top: 1rem;
+        font-family: monospace;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        border: 1px solid var(--accent);
+        padding: 0.2rem;
+        border-radius: 4px;
+        user-select: none;
+        background: var(--memory-cell-bg);
+      }
+      .memory-cell {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        border: 1px solid var(--accent);
+        margin-right: 2px;
+        text-align: center;
+        border-radius: 3px;
+        background: var(--memory-cell-bg);
+        color: var(--text);
+        position: relative;
+      }
+      .memory-cell.pointer {
+        background: var(--memory-pointer-bg);
+        font-weight: bold;
+        box-shadow: 0 0 6px var(--accent);
+      }
+      .memory-cell div:first-child {
+        font-size: 0.9em;
+      }
+      .memory-cell div:last-child {
+        font-size: 0.7em;
+        color: #999;
+      }
+      label {
+        font-weight: bold;
+        margin-top: 1rem;
+      }
+      .control-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+      }
+      .control-row > * {
+        margin-right: 0.5rem;
+      }
+      #dark-mode-toggle {
+        position: fixed;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: var(--btn-bg);
+        border: 1px solid var(--accent);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        color: var(--text);
+        cursor: pointer;
+        box-shadow: 0 0 5px var(--accent);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background 0.3s;
+      }
+      #dark-mode-toggle:hover {
+        background: var(--btn-hover-bg);
+      }
+      .quiz-question {
+        font-weight: bold;
+        margin-top: 0.8rem;
+      }
+      .quiz-options label {
+        display: block;
+        margin-left: 1rem;
+        cursor: pointer;
+      }
+      textarea {
+        resize: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <button
+      id="dark-mode-toggle"
+      aria-label="Toggle dark mode"
+      title="Toggle dark mode"
+    >
+      🌙
+    </button>
+    <div class="container" role="main" aria-live="polite" aria-atomic="true">
+      <h1>Learn PAINXL</h1>
+      <div id="progress-container" aria-label="Progress">
+        <div id="progress-fill"></div>
+      </div>
+      <div id="content-area"></div>
+      <div style="margin-top: 1rem">
+        <button id="btn-prev" class="btn" aria-label="Previous page">
+          ← Previous
+        </button>
+        <button id="btn-next" class="btn" aria-label="Next page">Next →</button>
+      </div>
+    </div>
+    <datalist id="cmdlist">
+      <li title="Move The Pointer To The Right">01001001</li>
+      <li title="Move The Pointer To The Left">01010101</li>
+      <li title="Increase The Current Cell By 1">00100101</li>
+      <li title="Decrease The Current Cell By 1">10010101</li>
+      <li title="Start A Loop">00000001</li>
+      <li title="End A Loop">11111101</li>
+      <li title="Set Current Cell To 0">00101101</li>
+      <li title="Get Character From The User">00011101</li>
+      <li title="Output ASCII Character">11100001</li>
+    </datalist>
+    <!-- PAINXL (Pointer-Advanced Impossible Nightmare eXecution Language) is an esoteric programming language created in 2025 by Muadth Ahmed. It was designed to be complex with minimal commands to challenge programmers and serve as the first step for anyone who wants to learn binary.\n\nFirst:\n\n What are the commands in PAINXL, and what do you need to learn to use it?\n\nTo learn PAINXL, you will need to understand ASCII.\n\nCommands:\n\n<br>## 01001001 (Move the pointer to the right)
+    01010101 (Move the pointer to the left)\n\n00100101 (Increase the current cell by 1)\n\n10010101 (Decrease the current cell by 1)\n\n00000001 (Start a loop)\n\n11111101 (End a loop)\n\n00101101 (Set current cell to 0)\n\n00011101 (Get a character from the user)\n\n11100001 (Output an ASCII character)\n\n -->
+    <script>
+      (() => {
+        const lessons = [
+          {
+            title: "What is PAINXL?",
+            text: `PAINXL is an esoteric programming language created in 2025 by Muadth Ahmed. It consists of only 9 commands and an instruction pointer. It operates on an array of memory cells (usually 300,000 bytes initialized to zero).\n\nIts purpose was to create the #2 smallest possible compiler while still being Turing-complete. The language is known for its extreme minimalism and challenge to program in.`,
+          },
+          {
+            title: "PAINXL Commands",
+            text: `PAINXL uses 9 commands:\n\n01001001  : Move the pointer to the right\n01010101  : Move the pointer to the left\n00100101  : Increment the memory cell at the pointer\n10010101  : Decrement the memory cell at the pointer\n11100001  : Output the character signified by the cell at the pointer\n00011101  : Input a character and store it in the cell at the pointer\n00000001  : Jump past matching 11111101 if the cell at the pointer is 0\n11100001  : Jump back to matching 00000001 if the cell at the pointer is not 0\n00101101  : Set current cell to 0\n\nAll other characters are ignored.`,
+          },
+          {
+            title: "Memory and Pointer",
+            text: `PAINXL operates on a simple array of bytes (cells) initially set to zero. The pointer starts at the first cell.\n\nYou can move the pointer left or right to access different cells, and increment or decrement the values in those cells.\n\nThis simplicity makes PAINXL quite challenging but also fascinating.`,
+          },
+          {
+            title: "Loops in PAINXL",
+            text: `Loops are formed with 00000001 and 11111101 commands:\n- When the interpreter reaches a '00000001' and the current cell is zero, it jumps forward to the command after the matching '11111101'.\n- When the interpreter reaches a '11111101' and the current cell is nonzero, it jumps back to the command after the matching '00000001'.\n\nThis allows you to create loops and repeat instructions while the cell at the pointer is not zero.`,
+          },
+          {
+            title: "Example: Hello World",
+            text: `Here's a famous PAINXL program that prints "Hello World!":\n\n 0010010100100101001001010010010100100101001001010010010\n1001001010010010100100101000000010100100100100\n10100100101001001010010010100100101001001010010\n010101001001001001010010010100100101001001010010\n010100100101001001010010010100100101001001010100\n1001001001010010010100100101010010010010010101010101010101\n010101010101010101100101011111110101001001001001010010010111\n1000010100100100100101111000010010010100100101001001010010010100100\n10100100101001001011110000111100001001001010010010100\n100101111000010100100100100101001001011110000101010101010101010010\n01010010010100100101001001010010010100100101001001010010010100100\n10100100101001001010010010100100101001001010010010111100001010010\n0111100001001001010010010100100101111000011001010110010101100101011001010\n11001010110010101111000011001010110010101100101011001010110010\n101100101011001010110010101111000010100100100100101111000\n010100100111100001\n\nTry running this program in the editor below to see how PAINXL works!`,
+          },
+        ];
+
+        const quiz = [
+          {
+            question: "How many commands does PAINXL have?",
+            options: ["6", "9", "10", "12"],
+            answer: 1,
+          },
+          {
+            question: "What does the '01001001' command do?",
+            options: [
+              "Increment the memory cell",
+              "Move pointer to the right",
+              "Output a character",
+              "Input a character",
+            ],
+            answer: 1,
+          },
+          {
+            question: "What happens when '00000001' encounters a zero cell?",
+            options: [
+              "It loops indefinitely",
+              "It jumps forward past matching '11111101'",
+              "It throws an error",
+              "It skips next command",
+            ],
+            answer: 1,
+          },
+          {
+            question: "PAINXL was created to:",
+            options: [
+              "Be easy to read",
+              "Be Turing-complete with minimal commands",
+              "Replace C language",
+              "Create web applications",
+            ],
+            answer: 1,
+          },
+          {
+            question: "What command outputs a character in PAINXL?",
+            options: ["00101101", "11100001", "00011101", "01010101"],
+            answer: 1,
+          },
+        ];
+
+        let quizAnswers = Array(quiz.length).fill(null);
+        let currentPage = 0; // lessons, then quiz, then results
+
+        const btnPrev = document.getElementById("btn-prev");
+        const btnNext = document.getElementById("btn-next");
+        const contentArea = document.getElementById("content-area");
+        const progressFill = document.getElementById("progress-fill");
+        const darkModeToggle = document.getElementById("dark-mode-toggle");
+
+        // PAINXL interpreter state variables
+        let memory = [];
+        let pointer = 0;
+        let painxlCode = "";
+        let painxlInput = "";
+        let output = "";
+        let codeIndex = 0;
+        let inputIndex = 0;
+        let loopStack = [];
+        let history = [];
+        let autoRunInterval = null;
+
+        // Elements for painxl interpreter controls
+        let painxlTextarea, inputTextarea, outputConsole;
+        let stepBtn, stepBackBtn, resetBtn, runBtn, autoRunToggle, speedInput;
+        let saveSelect, saveBtn, loadBtn, deleteBtn, downloadBtn;
+        let memoryVisualizer;
+
+        // Dark mode persistence
+        function loadDarkMode() {
+          if (localStorage.getItem("dark-mode") === "true") {
+            document.body.classList.add("dark");
+            darkModeToggle.textContent = "☀️";
+          } else {
+            document.body.classList.remove("dark");
+            darkModeToggle.textContent = "🌙";
+          }
+        }
+        darkModeToggle.onclick = () => {
+          document.body.classList.toggle("dark");
+          localStorage.setItem(
+            "dark-mode",
+            document.body.classList.contains("dark")
+          );
+          loadDarkMode();
+        };
+        loadDarkMode();
+
+        btnPrev.onclick = () => {
+          if (currentPage > 0) {
+            currentPage--;
+            render();
+          }
+        };
+        btnNext.onclick = () => {
+          if (currentPage < lessons.length + 1) {
+            currentPage++;
+            render();
+          }
+        };
+
+        function render() {
+          // Update buttons
+          btnPrev.disabled = currentPage === 0;
+          btnNext.disabled = currentPage === lessons.length + 1;
+
+          // Update progress bar
+          const progressPercent = (currentPage / (lessons.length + 1)) * 100;
+          progressFill.style.width = progressPercent + "%";
+
+          contentArea.innerHTML = "";
+
+          if (currentPage < lessons.length) {
+            // Show lesson page
+            const lesson = lessons[currentPage];
+            const title = document.createElement("h2");
+            title.textContent = lesson.title;
+            const text = document.createElement("div");
+            text.className = "lesson-text";
+            text.textContent = lesson.text;
+
+            contentArea.appendChild(title);
+            contentArea.appendChild(text);
+
+            // If last lesson, add note
+            if (currentPage === lessons.length - 1) {
+              const note = document.createElement("p");
+              note.style.fontStyle = "italic";
+              note.textContent =
+                "After finishing lessons, click Next to take a quiz and try the PAINXL editor below.";
+              contentArea.appendChild(note);
+            }
+          } else if (currentPage === lessons.length) {
+            // Quiz page
+            const title = document.createElement("h2");
+            title.textContent = "Quiz: Test your knowledge";
+            contentArea.appendChild(title);
+
+            quiz.forEach((q, i) => {
+              const qBlock = document.createElement("div");
+              qBlock.className = "quiz-question-block";
+
+              const qTitle = document.createElement("div");
+              qTitle.className = "quiz-question";
+              qTitle.textContent = i + 1 + ". " + q.question;
+              qBlock.appendChild(qTitle);
+
+              const optionsDiv = document.createElement("div");
+              optionsDiv.className = "quiz-options";
+
+              q.options.forEach((opt, idx) => {
+                const id = `quiz-${i}-${idx}`;
+                const label = document.createElement("label");
+                label.htmlFor = id;
+
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = "quiz-" + i;
+                radio.id = id;
+                radio.value = idx;
+                if (quizAnswers[i] === idx) radio.checked = true;
+
+                radio.onchange = () => {
+                  quizAnswers[i] = idx;
+                };
+
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(" " + opt));
+                optionsDiv.appendChild(label);
+              });
+
+              qBlock.appendChild(optionsDiv);
+              contentArea.appendChild(qBlock);
+            });
+
+            const submitBtn = document.createElement("button");
+            submitBtn.className = "btn";
+            submitBtn.textContent = "Submit Quiz";
+            submitBtn.onclick = () => {
+              if (quizAnswers.includes(null)) {
+                alert("Please answer all questions before submitting.");
+                return;
+              }
+              currentPage++;
+              render();
+            };
+            contentArea.appendChild(submitBtn);
+          } else {
+            // Results + PAINXL editor
+
+            // Calculate quiz score
+            const correctCount = quizAnswers.reduce((acc, ans, i) => {
+              return acc + (ans === quiz[i].answer ? 1 : 0);
+            }, 0);
+
+            const resultTitle = document.createElement("h2");
+            resultTitle.textContent = `Quiz Results: ${correctCount} out of ${quiz.length} correct`;
+            contentArea.appendChild(resultTitle);
+
+            // Show some encouragement
+            const msg = document.createElement("p");
+            if (correctCount === quiz.length) {
+              msg.textContent =
+                "Excellent! You're ready to try PAINXL programming yourself!";
+            } else if (correctCount >= quiz.length / 2) {
+              msg.textContent =
+                "Good job! Review lessons and try the editor below.";
+            } else {
+              msg.textContent =
+                "Keep practicing! The editor below will help you learn.";
+            }
+            contentArea.appendChild(msg);
+
+            // Add painxl editor UI
+            addPAINXLEditorUI();
+          }
+        }
+
+        function addPAINXLEditorUI() {
+          // Clear content area before adding
+          //contentArea.innerHTML = "";
+
+          // Editor label & textarea
+          const codeLabel = document.createElement("label");
+          codeLabel.textContent = "PAINXL Code:";
+          codeLabel.setAttribute("for", "painxl-editor");
+          contentArea.appendChild(codeLabel);
+
+          painxlTextarea = document.createElement("textarea");
+          painxlTextarea.list = "cmdlist";
+          painxlTextarea.id = "painxl-editor";
+          painxlTextarea.setAttribute("aria-label", "PAINXL code editor");
+          painxlTextarea.placeholder = "Enter your PAINXL code here...";
+          painxlTextarea.spellcheck = false;
+          contentArea.appendChild(painxlTextarea);
+
+          // Input label & textarea
+          const inputLabel = document.createElement("label");
+          inputLabel.textContent = "Input (optional):";
+          inputLabel.setAttribute("for", "input-textarea");
+          contentArea.appendChild(inputLabel);
+
+          inputTextarea = document.createElement("textarea");
+          inputTextarea.id = "input-textarea";
+          inputTextarea.setAttribute("aria-label", "Input for PAINXL program");
+          inputTextarea.placeholder = "Input characters for ',' commands";
+          inputTextarea.rows = 1;
+          inputTextarea.style.resize = "horizontal";
+          contentArea.appendChild(inputTextarea);
+
+          // Output console
+          const outputLabel = document.createElement("label");
+          outputLabel.textContent = "Output:";
+          outputLabel.setAttribute("for", "output-console");
+          contentArea.appendChild(outputLabel);
+
+          outputConsole = document.createElement("pre");
+          outputConsole.id = "output-console";
+          outputConsole.setAttribute("aria-live", "polite");
+          outputConsole.setAttribute("aria-label", "PAINXL program output");
+          contentArea.appendChild(outputConsole);
+
+          // Memory visualizer
+          const memoryLabel = document.createElement("label");
+          memoryLabel.textContent = "Memory (cells around pointer):";
+          contentArea.appendChild(memoryLabel);
+
+          memoryVisualizer = document.createElement("div");
+          memoryVisualizer.id = "memory-visualizer";
+          contentArea.appendChild(memoryVisualizer);
+
+          // Controls container
+          const controlsDiv = document.createElement("div");
+          controlsDiv.className = "control-row";
+
+          // Buttons: Run, Step Forward, Step Back, Reset
+          runBtn = document.createElement("button");
+          runBtn.className = "btn";
+          runBtn.textContent = "Run ▶";
+          runBtn.title = "Run entire program";
+          runBtn.onclick = () => {
+            stopAutoRun();
+            runPAINXL();
+          };
+          controlsDiv.appendChild(runBtn);
+
+          stepBtn = document.createElement("button");
+          stepBtn.className = "btn";
+          stepBtn.textContent = "Step ▶";
+          stepBtn.title = "Step forward one command";
+          stepBtn.onclick = () => {
+            stopAutoRun();
+            stepForward();
+          };
+          controlsDiv.appendChild(stepBtn);
+
+          stepBackBtn = document.createElement("button");
+          stepBackBtn.className = "btn";
+          stepBackBtn.textContent = "Step ◀";
+          stepBackBtn.title = "Step backward one command";
+          stepBackBtn.disabled = true;
+          stepBackBtn.onclick = () => {
+            stopAutoRun();
+            stepBackward();
+          };
+          controlsDiv.appendChild(stepBackBtn);
+
+          resetBtn = document.createElement("button");
+          resetBtn.className = "btn";
+          resetBtn.textContent = "Reset ⟳";
+          resetBtn.title = "Reset interpreter state";
+          resetBtn.onclick = () => {
+            stopAutoRun();
+            resetInterpreter();
+          };
+          controlsDiv.appendChild(resetBtn);
+
+          // Auto Run toggle + speed input
+          const speedLabel = document.createElement("label");
+          speedLabel.textContent = "Speed (ms):";
+          speedLabel.style.marginLeft = "1rem";
+          speedLabel.htmlFor = "speed-input";
+          controlsDiv.appendChild(speedLabel);
+
+          speedInput = document.createElement("input");
+          speedInput.id = "speed-input";
+          speedInput.type = "number";
+          speedInput.min = "10";
+          speedInput.value = "100";
+          speedInput.style.width = "70px";
+          speedInput.title = "Delay between auto-run steps in milliseconds";
+          controlsDiv.appendChild(speedInput);
+
+          autoRunToggle = document.createElement("button");
+          autoRunToggle.className = "btn";
+          autoRunToggle.textContent = "Auto Run ▶▶";
+          autoRunToggle.title = "Start/stop auto-run";
+          autoRunToggle.onclick = () => {
+            if (autoRunInterval) {
+              stopAutoRun();
+            } else {
+              startAutoRun();
+            }
+          };
+          controlsDiv.appendChild(autoRunToggle);
+
+          contentArea.appendChild(controlsDiv);
+
+          // Save/Load section
+          const saveLoadDiv = document.createElement("div");
+          saveLoadDiv.style.marginTop = "1rem";
+
+          saveSelect = document.createElement("select");
+          saveSelect.title = "Select saved program";
+          saveLoadDiv.appendChild(saveSelect);
+
+          saveBtn = document.createElement("button");
+          saveBtn.className = "btn";
+          saveBtn.textContent = "Save";
+          saveBtn.title = "Save current code";
+          saveBtn.onclick = () => {
+            const name = prompt("Enter a name to save your program:");
+            if (name) {
+              saveProgram(name);
+            }
+          };
+          // Wait to the second Chunk
+          saveLoadDiv.appendChild(saveBtn);
+
+          loadBtn = document.createElement("button");
+          loadBtn.className = "btn";
+          loadBtn.textContent = "Load";
+          loadBtn.title = "Load selected program";
+          loadBtn.onclick = () => {
+            loadProgram();
+          };
+          saveLoadDiv.appendChild(loadBtn);
+
+          deleteBtn = document.createElement("button");
+          deleteBtn.className = "btn";
+          deleteBtn.textContent = "Delete";
+          deleteBtn.title = "Delete selected saved program";
+          deleteBtn.onclick = () => {
+            deleteProgram();
+          };
+          saveLoadDiv.appendChild(deleteBtn);
+
+          downloadBtn = document.createElement("button");
+          downloadBtn.className = "btn";
+          downloadBtn.textContent = "Download .painxl";
+          downloadBtn.title = "Download current code as .painxl file";
+          downloadBtn.onclick = () => {
+            downloadProgram();
+          };
+          const exportBtn = document.createElement("button");
+          exportBtn.className = "btn";
+          exportBtn.textContent = "Export Memory";
+          exportBtn.title = "Download memory state";
+          exportBtn.onclick = exportMemoryDump;
+          saveLoadDiv.appendChild(exportBtn);
+
+          const importBtn = document.createElement("button");
+          importBtn.className = "btn";
+          importBtn.textContent = "Import Memory";
+          importBtn.title = "Upload memory state";
+          importBtn.onclick = importMemoryDump;
+          saveLoadDiv.appendChild(importBtn);
+
+          saveLoadDiv.appendChild(downloadBtn);
+
+          contentArea.appendChild(saveLoadDiv);
+
+          // Initialize interpreter with empty code
+          resetInterpreter();
+          loadSavedPrograms();
+          createWatchUI();
+        }
+
+        // Interpreter functions
+
+        function resetInterpreter() {
+          memory = new Array(30000).fill(0);
+          pointer = 0;
+          output = "";
+          codeIndex = 0;
+          inputIndex = 0;
+          loopStack = [];
+          history = [];
+          outputConsole.textContent = "";
+          updateMemoryVisualizer();
+          painxlTextarea.disabled = false;
+          inputTextarea.disabled = false;
+          stepBackBtn.disabled = true;
+        }
+
+        function stepBackward() {
+          if (history.length === 0) return;
+          const prev = history.pop();
+          codeIndex = prev.codeIndex;
+          pointer = prev.pointer;
+          memory = prev.memory;
+          output = prev.output;
+          inputIndex = prev.inputIndex;
+          loopStack = prev.loopStack;
+
+          outputConsole.textContent = output;
+          updateMemoryVisualizer();
+          stepBackBtn.disabled = history.length === 0;
+        }
+
+        // --- Put these replacements into your script (replace the originals) ---
+
+        // We'll keep a sanitized program string here:
+        let programCode = "";
+
+        // Run full program (sanitizes input to only 0/1 and removes comments/whitespace)
+        function runPAINXL() {
+          // Sanitize: remove anything that's not 0 or 1
+          programCode = painxlTextarea.value.replace(/[^01]/g, "");
+          if (programCode.length === 0) {
+            alert(
+              "No binary commands found. Make sure your program uses only 0 and 1 in 8-bit commands."
+            );
+            return;
+          }
+          if (programCode.length % 8 !== 0) {
+            // still allow, but warn the user
+            if (
+              !confirm(
+                "Program length is not a multiple of 8 bits. Continue anyway?"
+              )
+            )
+              return;
+          }
+
+          painxlInput = inputTextarea.value;
+          // reset interpreter (this clears memory, pointer, codeIndex, etc.)
+          resetInterpreter();
+          // ensure we start from the sanitized program
+          // do not overwrite programCode after this
+          painxlTextarea.disabled = true;
+          inputTextarea.disabled = true;
+          try {
+            while (codeIndex < programCode.length) {
+              stepForward();
+            }
+          } catch (e) {
+            alert("Error: " + e.message);
+            painxlTextarea.disabled = false;
+            inputTextarea.disabled = false;
+          }
+        }
+
+        // Step forward one command (uses programCode, not raw textarea)
+        function stepForward() {
+          // Ensure we have a sanitized program string to step through
+          if (!programCode || programCode.length === 0) {
+            // compute sanitized programCode lazily if not set yet
+            programCode = painxlTextarea.value.replace(/[^01]/g, "");
+          }
+          painxlInput = inputTextarea.value;
+
+          if (codeIndex >= programCode.length) return;
+
+          // Grab 8-bit command starting at current index
+          const cmd = programCode.slice(codeIndex, codeIndex + 8);
+
+          // Record history (deep copy memory)
+          history.push({
+            codeIndex,
+            pointer,
+            memory: memory.slice(),
+            output,
+            inputIndex,
+            loopStack: loopStack.slice(),
+          });
+
+          switch (cmd) {
+            case "01001001":
+              pointer++;
+              if (pointer >= memory.length) pointer = 0;
+              break;
+            case "01010101":
+              pointer--;
+              if (pointer < 0) pointer = memory.length - 1;
+              break;
+            case "00100101":
+              memory[pointer] = (memory[pointer] + 1) & 255;
+              break;
+            case "00101101":
+              memory[pointer] = 0;
+              break;
+            case "10010101":
+              memory[pointer] = (memory[pointer] - 1) & 255;
+              break;
+            case "11100001":
+              output += String.fromCharCode(memory[pointer]);
+              outputConsole.textContent = output;
+              break;
+            case "00011101":
+              if (inputIndex < painxlInput.length) {
+                memory[pointer] = painxlInput.charCodeAt(inputIndex);
+                inputIndex++;
+              } else {
+                memory[pointer] = 0;
+              }
+              break;
+            case "00000001":
+              if (memory[pointer] === 0) {
+                // jump forward to after matching 11111101
+                let loop = 1;
+                while (loop > 0) {
+                  codeIndex += 8;
+                  if (codeIndex >= programCode.length)
+                    throw new Error(
+                      "Loop '00000001' without matching '11111101'"
+                    );
+                  const innerCmd = programCode.slice(codeIndex, codeIndex + 8);
+                  if (innerCmd === "00000001") loop++;
+                  else if (innerCmd === "11111101") loop--;
+                }
+                // After this loop, codeIndex points at the matching '11111101'
+                // We'll advance past it below by adding 8.
+              } else {
+                loopStack.push(codeIndex);
+              }
+              break;
+            case "11111101":
+              if (memory[pointer] !== 0) {
+                if (loopStack.length === 0)
+                  throw new Error(
+                    "Loop '11111101' without matching '00000001'"
+                  );
+                codeIndex = loopStack[loopStack.length - 1];
+                // We return early so we DO NOT advance past the loop start here.
+                updateMemoryVisualizer();
+                stepBackBtn.disabled = history.length === 0;
+                return;
+              } else {
+                // matched loop end and cell is zero -> pop start
+                loopStack.pop();
+              }
+              break;
+            default:
+              // Unknown command — ignore it gracefully.
+              // (If program is sanitized this likely won't happen.)
+              break;
+          }
+
+          // Move to next command (advance by 8 chars)
+          codeIndex += 8;
+          updateMemoryVisualizer();
+
+          stepBackBtn.disabled = history.length === 0;
+        }
+
+        // Auto-run: use programCode and stepForward consistently
+        function startAutoRun() {
+          if (autoRunInterval) return;
+          if (!programCode || programCode.length === 0) {
+            programCode = painxlTextarea.value.replace(/[^01]/g, "");
+          }
+          autoRunToggle.textContent = "Stop ⏸";
+          painxlTextarea.disabled = true;
+          inputTextarea.disabled = true;
+          const delay = Math.max(1, parseInt(speedInput.value) || 100);
+          autoRunInterval = setInterval(() => {
+            if (codeIndex >= programCode.length) {
+              stopAutoRun();
+              return;
+            }
+
+            try {
+              stepForward();
+            } catch (e) {
+              alert("Error: " + e.message);
+              stopAutoRun();
+            }
+          }, delay);
+        }
+
+        function stopAutoRun() {
+          if (autoRunInterval) {
+            clearInterval(autoRunInterval);
+            autoRunInterval = null;
+            autoRunToggle.textContent = "Auto Run ▶▶";
+            painxlTextarea.disabled = false;
+            inputTextarea.disabled = false;
+          }
+        }
+
+        // Fix saved programs display (strip "painxl_prog_" which is 12 chars)
+        function loadSavedPrograms() {
+          saveSelect.innerHTML = "";
+          const keys = Object.keys(localStorage).filter((k) =>
+            k.startsWith("painxl_prog_")
+          );
+          if (keys.length === 0) {
+            const opt = document.createElement("option");
+            opt.textContent = "(No saved programs)";
+            opt.disabled = true;
+            saveSelect.appendChild(opt);
+            return;
+          }
+          keys.forEach((k) => {
+            const opt = document.createElement("option");
+            opt.value = k;
+            // strip the prefix "painxl_prog_" (12 characters)
+            opt.textContent = k.slice(12);
+            saveSelect.appendChild(opt);
+          });
+        }
+
+        // Memory visualizer updates
+        function updateMemoryVisualizer() {
+          const cellsToShow = 10;
+          const start = Math.max(0, pointer - Math.floor(cellsToShow / 2));
+          const end = Math.min(memory.length, start + cellsToShow);
+
+          memoryVisualizer.innerHTML = "";
+          for (let i = start; i < end; i++) {
+            const cell = document.createElement("div");
+            cell.className = "memory-cell" + (i === pointer ? " pointer" : "");
+            const val = memory[i];
+            const char =
+              val >= 32 && val <= 126 ? String.fromCharCode(val) : ".";
+            cell.innerHTML = `<div>${val}</div><div style="font-size:0.75em;color:gray;">${char}</div>`;
+            memoryVisualizer.appendChild(cell);
+          }
+          updateWatchOutput();
+        }
+
+        // === Debug Watch Mode ===
+        const watchList = [0, 1, 2, 10, 20]; // You can customize this
+        let watchOutputDiv;
+
+        function createWatchUI() {
+          const label = document.createElement("label");
+          label.textContent = "🔍 Watched Cells:";
+          contentArea.appendChild(label);
+
+          watchOutputDiv = document.createElement("div");
+          watchOutputDiv.style.fontFamily = "monospace";
+          watchOutputDiv.style.whiteSpace = "pre";
+          watchOutputDiv.style.padding = "0.5rem";
+          watchOutputDiv.style.background = "var(--memory-cell-bg)";
+          watchOutputDiv.style.color = "var(--text)";
+          watchOutputDiv.style.border = "1px solid var(--accent)";
+          watchOutputDiv.style.borderRadius = "4px";
+
+          contentArea.appendChild(watchOutputDiv);
+
+          updateWatchOutput();
+        }
+
+        function updateWatchOutput() {
+          if (!watchOutputDiv) return;
+          const lines = watchList.map((i) => {
+            const val = memory[i];
+            return `Cell[${i.toString().padStart(3)}]: ${val
+              .toString()
+              .padStart(3)} = '${
+              val >= 32 && val <= 126 ? String.fromCharCode(val) : "."
+            }'`;
+          });
+          watchOutputDiv.textContent = lines.join("\n");
+        }
+
+        // Save/load programs to localStorage
+        function loadSavedPrograms() {
+          saveSelect.innerHTML = "";
+          const keys = Object.keys(localStorage).filter((k) =>
+            k.startsWith("painxl_prog_")
+          );
+          if (keys.length === 0) {
+            const opt = document.createElement("option");
+            opt.textContent = "(No saved programs)";
+            opt.disabled = true;
+            saveSelect.appendChild(opt);
+            return;
+          }
+          keys.forEach((k) => {
+            const opt = document.createElement("option");
+            opt.value = k;
+            opt.textContent = k.slice(8);
+            saveSelect.appendChild(opt);
+          });
+        }
+
+        function saveProgram(name) {
+          const code = painxlTextarea.value;
+          if (!code) {
+            alert("Code is empty, cannot save.");
+            return;
+          }
+          localStorage.setItem("painxl_prog_" + name, code);
+          loadSavedPrograms();
+          alert(`Program "${name}" saved.`);
+        }
+
+        function loadProgram() {
+          const key = saveSelect.value;
+          if (!key || key === "(No saved programs)") {
+            alert("No program selected to load.");
+            return;
+          }
+          const code = localStorage.getItem(key);
+          if (code === null) {
+            alert("Selected program not found.");
+            loadSavedPrograms();
+            return;
+          }
+          painxlTextarea.value = code;
+          resetInterpreter();
+        }
+
+        function deleteProgram() {
+          const key = saveSelect.value;
+          if (!key || key === "(No saved programs)") {
+            alert("No program selected to delete.");
+            return;
+          }
+          if (
+            confirm(
+              `Are you sure you want to delete program "${key.slice(8)}"?`
+            )
+          ) {
+            localStorage.removeItem(key);
+            loadSavedPrograms();
+            resetInterpreter();
+          }
+        }
+
+        function downloadProgram() {
+          const code = painxlTextarea.value;
+          if (!code) {
+            alert("No code to download.");
+            return;
+          }
+          const blob = new Blob([code], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "program.painxl";
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 0);
+        }
+        function exportMemoryDump() {
+          const dump = memory.map((v, i) => `${i}:${v}`).join("\n");
+          const blob = new Blob([dump], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "memory_dump.txt";
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 0);
+        }
+
+        function importMemoryDump() {
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = ".txt";
+          input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+              const lines = reader.result.split("\n");
+              lines.forEach((line) => {
+                const [idx, val] = line.split(":").map((s) => s.trim());
+                if (!isNaN(idx) && !isNaN(val)) {
+                  memory[parseInt(idx)] = parseInt(val) & 255;
+                }
+              });
+              updateMemoryVisualizer();
+              updateWatchOutput();
+            };
+            reader.readAsText(file);
+          };
+          input.click();
+        }
+
+        // Initial render
+        render();
+      })();
+    </script>
+  </body>
+</html>
