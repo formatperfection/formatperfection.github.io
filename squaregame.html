@@ -64,7 +64,7 @@ canvas.addEventListener("mousedown", e => {
   const my = e.clientY - rect.top;
 
   if (mx >= x && mx <= x + SQUARE_SIZE && my >= y && my <= y + SQUARE_SIZE) {
-    speed += 40;
+    speed += 50;
     score++;
     elapsedSinceClick = 0;
 
@@ -210,3 +210,4 @@ requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
+
