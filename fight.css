@@ -1,29 +1,53 @@
 * {
   box-sizing: border-box;
+  transition: 0.5s ease-in-out all;
 }
 :root {
-  --primary-bg: #222;
-  --secondary-bg: #444;
-  --panel-bg: #181925;
-  --border-color: #666;
-  --accent1: #3399ff;
-  --accent2: #ff4444;
-  --accent3: #1ec8c8;
-  --text-color: #fff;
-  --status-bg: #16181fdd;
-  --btn-bg: #252837;
-  --btn-hover: #1ec8c8;
-  --btn-text: #fff;
-  --ui-radius: 16px;
+  --bg-color: #0d0d0d;
+  --primary-color: #00ffff;
+  --primary-color-light: #66ffff;
+  --text-color: #00ffff;
+  --button-bg: transparent;
+  --button-border: 2px solid var(--primary-color);
+  --button-hover-bg: var(--primary-color);
+  --button-hover-color: #000;
+  --font-family: "Orbitron", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --panel-bg: rgba(13, 13, 13, 0.85);
+  --box-shadow-color: #00ffff;
+  --border-radius: 12px;
 }
 body {
   margin: 0;
-  background: var(--primary-bg);
+  background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: "Segoe UI", Arial, sans-serif;
-  min-height: 100vh;
-  transition: background 0.3s, color 0.3s;
+  font-family: var(--font-family);
+  text-align: center;
 }
+.laser,
+.sword,
+.bullet.blue {
+  box-shadow: 0 0 18px 6px var(--primary-color);
+  background: linear-gradient(90deg, #fff, var(--primary-color));
+}
+
+button,
+#restart,
+#helpBtn,
+#settingsBtn {
+  background: var(--button-bg);
+  color: var(--text-color);
+  border: var(--button-border);
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 12px var(--box-shadow-color);
+  transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+}
+
+button:hover {
+  background-color: var(--button-hover-bg);
+  color: var(--button-hover-color);
+  box-shadow: 0 0 25px var(--box-shadow-color);
+}
+
 body.light {
   --primary-bg: #e6e6e6;
   --secondary-bg: #fff;
@@ -35,6 +59,14 @@ body.light {
   --btn-hover: #31c3ff;
   --btn-text: #222;
 }
+#game,
+#help-screen,
+#settings-screen {
+  background: var(--panel-bg) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 0 25px var(--primary-color) !important;
+}
+
 #game {
   position: relative;
   width: 950px;
@@ -76,7 +108,7 @@ body.light {
   opacity: 0.92;
   box-shadow: 0 2px 7px 1px #0004;
   z-index: 2;
-  transition: transform 0.5s !important;
+  transition: transform 0.5s;
 }
 .arm.left {
   left: -2px;
@@ -107,7 +139,7 @@ body.light {
   transform: translateX(-50%);
   z-index: 4;
   box-shadow: 0 0 20px 2px #acf9;
-  transition: transform 0.5s !important;
+  transition: transform 0.5s;
 }
 .sword.active {
   display: block;
@@ -486,7 +518,7 @@ body.light {
 #backBtn:hover,
 #settingsBackBtn:hover,
 #aiDifficultyBackBtn:hover {
-  background: #1ec8c8 !important;
+  background: #1ec8c8;
   color: #fff;
 }
 .setting-item {
@@ -522,7 +554,7 @@ input[type="radio"] {
   font-weight: 500;
 }
 #aiSettingsBtn:hover {
-  background-color: var(--btn-hover) !important;
+  background-color: var(--btn-hover);
   color: white;
 }
 #aiSettingsBtn {
